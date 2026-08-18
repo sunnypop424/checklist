@@ -1,6 +1,14 @@
-/* 오버레이 전용 — 배경은 반드시 투명하게 유지 */
+/* 오버레이 전용 — 배경은 반드시 투명하게 유지.
+   이 파일은 /o/* 라우트에서만 로드되므로 html/body 규칙이 컨트롤 페이지에 새지 않는다. */
+html,
+body {
+  height: 100%;
+}
+
+/* .overlay-root 본체 스타일은 globals.css 에 있다 (미리보기와 공유) */
 .overlay-root {
-  padding: 12px;
+  /* OBS 브라우저 소스 높이 = 뷰포트 높이 */
+  height: 100vh;
 }
 
 .overlay-debug {

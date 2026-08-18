@@ -38,6 +38,8 @@ export default async function OverlayPage({ params, searchParams }: Props) {
       debug={one(sp.debug) === '1'}
       hideDone={one(sp.hideDone) === '1'}
       hideProgress={one(sp.hideProgress) === '1'}
+      sortDone={one(sp.sortDone) !== '0'}
+      hideEmpty={one(sp.hideEmpty) === '1'}
     />
   );
 }

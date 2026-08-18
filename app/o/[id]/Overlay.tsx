@@ -14,6 +14,8 @@ type Props = {
   debug: boolean;
   hideDone: boolean;
   hideProgress: boolean;
+  sortDone: boolean;
+  hideEmpty: boolean;
 };
 
 const POLL_NORMAL = 15_000;
@@ -28,6 +30,8 @@ export default function Overlay({
   debug,
   hideDone,
   hideProgress,
+  sortDone,
+  hideEmpty,
 }: Props) {
   const [list, setList] = useState<List>(initialList);
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -156,12 +160,14 @@ export default function Overlay({
   const dot = connected ? 'ok' : age < 30_000 ? 'poll' : 'stale';
 
   return (
-    <div className="overlay-root" style={{ fontSize: `${scale}rem` }}>
+    <div className="overlay-root" style={{ fontSize: `${scale}rem` }} data-debug={debug ? 'true' : 'false'}>
       <ChecklistPanel
         title={list.title}
         items={items}
         hideDone={hideDone}
         hideProgress={hideProgress}
+        sortDone={sortDone}
+        hideEmpty={hideEmpty}
       />
       {debug && (
         <div className="overlay-debug">

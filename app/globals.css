@@ -87,6 +87,8 @@ body {
 .panel {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   padding: 16px 20px 18px;
   border-radius: var(--radius-panel);
   background: rgba(20, 21, 23, 0.82);
@@ -103,30 +105,11 @@ body {
 }
 
 .panel__head {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-}
-
-/* 치지직 미션 마크 pill: height 22px / radius 5px / 브랜드 채움 + 검정 글자 */
-.panel__mark {
-  flex: none;
-  height: 1.375em;
-  padding: 0 0.4em;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 5px;
-  background: var(--brand);
-  color: #000;
-  font-size: 0.8125em;
-  font-weight: 800;
-  letter-spacing: 0;
-  transition: background 0.2s var(--ease);
-}
-
-.panel[data-complete='true'] .panel__mark {
-  background: #fff;
 }
 
 .panel__title {
@@ -163,6 +146,7 @@ body {
 
 /* 진행률 바 — 치지직 예측 패널(_9861q_) 메트릭 */
 .panel__progress {
+  flex: none;
   margin-top: 10px;
   height: 4px;
   border-radius: 2px;
@@ -178,12 +162,37 @@ body {
 }
 
 .panel__list {
+  flex: 1 1 auto;
+  /* flex 자식이 내용 크기 아래로 줄어들 수 있게 — 없으면 잘리지 않고 패널이 넘친다 */
+  min-height: 0;
+  overflow: hidden;
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+/* 실제로 넘칠 때만 아래쪽을 페이드한다 (JS 가 data-clipped 를 설정) */
+.panel[data-clipped='true'] .panel__list {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent 100%);
+}
+
+/* 페이드 위에 얹히는 "+N개 더" — 마스크 바깥이라 흐려지지 않는다 */
+.panel__more {
+  flex: none;
+  align-self: center;
+  margin-top: -14px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-cool);
+  font-size: 0.75em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .panel__empty {
@@ -272,4 +281,22 @@ body {
 
 .row[data-done='true'] .row__label::after {
   width: 100%;
+}
+
+/* ============================================================
+   오버레이 루트 — 부모(OBS 소스 / 미리보기 무대)의 높이를 꽉 채운다.
+   패널은 위쪽에 붙고, 남는 아래 공간은 투명하게 비워둔다.
+   ============================================================ */
+
+.overlay-root {
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* 패널이 무대 높이를 넘지 않게 — 이 제약이 목록 잘림을 만든다 */
+.overlay-root > .panel {
+  max-height: 100%;
 }

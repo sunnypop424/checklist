@@ -37,19 +37,6 @@
   color: var(--text-cool-strong);
 }
 
-.control__brand-mark {
-  height: 22px;
-  padding: 0 6px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 5px;
-  background: var(--brand);
-  color: #000;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
 .control__hint {
   color: var(--text-cool);
   font-size: 13px;
@@ -466,10 +453,15 @@
   font-weight: 700;
 }
 
-/* 투명도가 눈에 보이도록 체커보드 */
+/* 투명도가 눈에 보이도록 체커보드.
+   크기를 OBS 소스 기본값(420x720)과 똑같이 맞춰서 잘리는 지점이 그대로 보이게 한다.
+   안쪽 여백은 .overlay-root 가 담당한다. */
 .preview__stage {
-  padding: 14px;
+  width: 420px;
+  height: 720px;
+  max-width: 100%;
   border-radius: var(--radius-lg);
+  overflow: hidden;
   background-color: #3a3f46;
   background-image:
     linear-gradient(45deg, #2b3036 25%, transparent 25%),

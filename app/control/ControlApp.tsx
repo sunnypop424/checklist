@@ -269,7 +269,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     <main className="control">
       <header className="control__top">
         <h1 className="control__brand">
-          <span className="control__brand-mark">MISSION</span> 체크리스트
+          방송 체크리스트
         </h1>
         <a className="control__hint" href="#help">
           OBS 설정법
@@ -450,9 +450,11 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
             {/* ── 미리보기 ── */}
             {showPreview && (
               <section className="preview">
-                <div className="preview__label">OBS 에 나가는 화면</div>
+                <div className="preview__label">OBS 에 나가는 화면 (420 × 720)</div>
                 <div className="preview__stage">
-                  <ChecklistPanel title={activeList.title} items={items} />
+                  <div className="overlay-root">
+                    <ChecklistPanel title={activeList.title} items={items} />
+                  </div>
                 </div>
                 <div className="preview__url">
                   <code>/o/{activeList.id}</code>
