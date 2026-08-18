@@ -27,6 +27,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   const [copied, setCopied] = useState(false);
   const [showOptions, setShowOptions] = useState(true);
   const [showPreview, setShowPreview] = useState(true);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [renamingList, setRenamingList] = useState(false);
   const [options, setOptions] = useState<OverlayOptions>(DEFAULT_OPTIONS);
@@ -340,9 +341,15 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     );
   }, [activeId, options, showToast]);
 
-  // ── 숫자키 1~9 로 N번째 항목 토글 ──────────────────────────
+  // ── 숫자키 1~9 로 N번째 항목 토글 / Esc 로 모달 닫기 ───────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && helpOpen) {
+        setHelpOpen(false);
+        return;
+      }
+      // 모달이 떠 있는 동안은 뒤쪽 체크리스트가 반응하면 안 된다
+      if (helpOpen) return;
       const el = e.target as HTMLElement | null;
       if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -356,7 +363,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [items, toggle]);
+  }, [helpOpen, items, toggle]);
 
   const activeList = lists.find((l) => l.id === activeId) ?? null;
   const doneCount = items.filter((i) => i.done).length;
@@ -369,9 +376,9 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
         <h1 className="control__brand">
           방송 체크리스트
         </h1>
-        <a className="control__hint" href="#help">
+        <button className="control__hint" onClick={() => setHelpOpen(true)}>
           OBS 설정법
-        </a>
+        </button>
       </header>
 
       {/* ── 리스트 전환 ── */}
@@ -596,32 +603,60 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
             )}
           </div>
 
-          <section id="help" className="help">
-            <h2>OBS 설정</h2>
-            <ol>
-              <li>
-                소스 추가 → <b>브라우저</b>, URL 은 위 <b>OBS URL 복사</b> 버튼으로 복사한 주소
-              </li>
-              <li>
-                너비 <b>{options.width}</b>, 높이 <b>{options.height}</b> (위 옵션에서 바꿀 수 있습니다)
-              </li>
-              <li>
-                <b>소스가 보이지 않을 때 종료</b> 체크 해제
-              </li>
-              <li>
-                <b>장면이 활성화될 때 브라우저 새로고침</b> 체크 해제
-              </li>
-              <li>
-                <b>사용자 지정 프레임 속도</b> 체크 후 <b>30</b> fps
-              </li>
-              <li>사용자 지정 CSS 는 기본값 그대로 둘 것</li>
-            </ol>
-            <p className="help__note">
-              글자 크기는 OBS 변형 핸들로 늘리지 마세요 — 소스 해상도로 렌더한 걸 OBS 가 다시
-              늘리기 때문에 글자가 뭉개집니다. 위 <b>오버레이 옵션</b>에서 글자 크기와 소스 크기를
-              바꾸면 어느 크기에서도 선명합니다.
-            </p>
-          </section>
+          {/* ── OBS 설정법 (모달) ── */}
+          {helpOpen && (
+            <div
+              className="modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="help-title"
+              onClick={() => setHelpOpen(false)}
+            >
+              <div className="modal__panel" onClick={(e) => e.stopPropagation()}>
+                <div className="modal__head">
+                  <h2 id="help-title" className="modal__title">
+                    OBS 설정
+                  </h2>
+                  <button
+                    className="modal__close"
+                    onClick={() => setHelpOpen(false)}
+                    aria-label="닫기"
+                    autoFocus
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="help">
+                  <ol>
+                    <li>
+                      소스 추가 → <b>브라우저</b>, URL 은 툴바의 <b>OBS URL 복사</b> 버튼으로 복사한
+                      주소
+                    </li>
+                    <li>
+                      너비 <b>{options.width}</b>, 높이 <b>{options.height}</b> (오버레이 옵션에서
+                      바꿀 수 있습니다)
+                    </li>
+                    <li>
+                      <b>소스가 보이지 않을 때 종료</b> 체크 해제
+                    </li>
+                    <li>
+                      <b>장면이 활성화될 때 브라우저 새로고침</b> 체크 해제
+                    </li>
+                    <li>
+                      <b>사용자 지정 프레임 속도</b> 체크 후 <b>30</b> fps
+                    </li>
+                    <li>사용자 지정 CSS 는 기본값 그대로 둘 것</li>
+                  </ol>
+                  <p className="help__note">
+                    글자 크기는 OBS 변형 핸들로 늘리지 마세요 — 소스 해상도로 렌더한 걸 OBS 가 다시
+                    늘리기 때문에 글자가 뭉개집니다. <b>오버레이 옵션</b>에서 글자 크기와 소스 크기를
+                    바꾸면 어느 크기에서도 선명합니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <section className="empty">
