@@ -411,23 +411,6 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               </button>
             )}
 
-            <div className="toolbar__actions">
-              <button className="btn" onClick={resetAll} disabled={doneCount === 0}>
-                전체 해제
-              </button>
-              <button className="btn" onClick={copyOverlayUrl}>
-                {copied ? '복사됨 ✓' : 'OBS URL 복사'}
-              </button>
-              <button className="btn" onClick={toggleOptions} aria-pressed={showOptions}>
-                옵션 {showOptions ? '끄기' : '켜기'}
-              </button>
-              <button className="btn" onClick={togglePreview} aria-pressed={showPreview}>
-                미리보기 {showPreview ? '끄기' : '켜기'}
-              </button>
-              <button className="btn btn--danger" onClick={deleteList}>
-                리스트 삭제
-              </button>
-            </div>
           </section>
 
           <div className="control__body" data-aside={showOptions || showPreview ? 'true' : 'false'}>
@@ -516,6 +499,25 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               <p className="add__hint">
                 여러 줄을 붙여넣으면 한 번에 등록됩니다. 숫자키 <kbd>1</kbd>~<kbd>9</kbd> 로 토글.
               </p>
+
+              {/* 방송 중 자주 쓰는 건 체크 토글뿐이라, 나머지 버튼은 목록 아래로 내렸다 */}
+              <div className="editor__actions">
+                <button className="btn" onClick={resetAll} disabled={doneCount === 0}>
+                  전체 해제
+                </button>
+                <button className="btn" onClick={copyOverlayUrl}>
+                  {copied ? '복사됨 ✓' : 'OBS URL 복사'}
+                </button>
+                <button className="btn" onClick={toggleOptions} aria-pressed={showOptions}>
+                  옵션 {showOptions ? '끄기' : '켜기'}
+                </button>
+                <button className="btn" onClick={togglePreview} aria-pressed={showPreview}>
+                  미리보기 {showPreview ? '끄기' : '켜기'}
+                </button>
+                <button className="btn btn--danger" onClick={deleteList}>
+                  리스트 삭제
+                </button>
+              </div>
             </section>
 
             {/* ── 옵션 + 미리보기 ── */}
