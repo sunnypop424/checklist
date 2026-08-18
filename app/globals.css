@@ -1,0 +1,275 @@
+/* ============================================================
+   치지직(CHZZK) 디자인 토큰
+   D:\치지직 의 vendor-DVDNLy6N.css / index-B0NFrBmv.css 실측값
+   ============================================================ */
+
+/* 치지직이 실제로 쓰는 것과 동일한 웹폰트 (한글 자모 단위 dynamic subset) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+/* CDN 이 죽어도 방송이 안 깨지도록 로컬 파일을 폴백으로 둔다 */
+@font-face {
+  font-family: 'Pretendard Local';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+  font-weight: 45 920;
+  font-style: normal;
+  /* swap 아님 — 방송 중 폰트가 바뀌는 게 화면에 보인다 */
+  font-display: block;
+}
+
+:root {
+  /* 표면 — 치지직 다크 계단 */
+  --bg:             #141517;
+  --surface-weakest:#0e0f10;
+  --surface-weaker: #1c1d1f;
+  --surface-weak:   #202224;
+  --surface-subtle: #2a2c2f;
+  --surface-base:   #2e3033;
+  --surface-strong: #4d4d4d;
+
+  /* 브랜드 그린 (다크 테마 램프) */
+  --brand:          #00ffa3;
+  --brand-stronger: #00e693;
+  --brand-strong:   #00cc82;
+  --brand-base:     #009962;
+
+  /* 텍스트 — cool-gray 계열 */
+  --text:             #ffffff;
+  --text-cool-strong: #c9cedc;
+  --text-cool:        #9da5b6;
+  --text-cool-weak:   #697183;
+
+  --danger: #e02020;
+
+  /* 상호작용: 배경 교체가 아니라 투명 오버레이를 덧씌운다 */
+  --hover: #ffffff0d;
+  --press: #ffffff1f;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-panel: 20px;
+
+  --shadow-card: 0 6px 6px #0000004d, 0 6px 18px 6px #0003;
+
+  --font: 'Pretendard Variable', 'Pretendard', 'Pretendard Local', 'Malgun Gothic',
+    'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* ⚠ 여기에 배경색을 넣으면 OBS 에 검은 사각형이 통째로 뜬다 */
+  background: transparent;
+  font-family: var(--font);
+  letter-spacing: -0.3px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* ============================================================
+   체크리스트 패널 — 오버레이와 컨트롤 미리보기가 공유
+   치지직 미션 오버레이(_is_overlay_) 메트릭 기반
+   ============================================================ */
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 20px 18px;
+  border-radius: var(--radius-panel);
+  background: rgba(20, 21, 23, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* 전부 완료되면 테두리와 마크만 브랜드 그린으로 (패널은 다크 유지 = 게임 위 가독성) */
+.panel[data-complete='true'] {
+  border-color: rgba(0, 255, 163, 0.45);
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(0, 255, 163, 0.12) inset;
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 치지직 미션 마크 pill: height 22px / radius 5px / 브랜드 채움 + 검정 글자 */
+.panel__mark {
+  flex: none;
+  height: 1.375em;
+  padding: 0 0.4em;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 5px;
+  background: var(--brand);
+  color: #000;
+  font-size: 0.8125em;
+  font-weight: 800;
+  letter-spacing: 0;
+  transition: background 0.2s var(--ease);
+}
+
+.panel[data-complete='true'] .panel__mark {
+  background: #fff;
+}
+
+.panel__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.3125em;
+  line-height: 1.375em;
+  font-weight: 700;
+  color: var(--text-cool-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel__count {
+  flex: none;
+  font-size: 1.125em;
+  font-weight: 800;
+  color: var(--text-cool-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel__count em {
+  font-style: normal;
+  color: var(--brand);
+  transition: color 0.2s var(--ease);
+}
+
+.panel__count-sep {
+  margin: 0 0.15em;
+  opacity: 0.6;
+}
+
+/* 진행률 바 — 치지직 예측 패널(_9861q_) 메트릭 */
+.panel__progress {
+  margin-top: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.panel__bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+  transition: width 0.26s var(--ease);
+}
+
+.panel__list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel__empty {
+  margin: 14px 0 2px;
+  color: var(--text-cool-weak);
+  font-size: 0.9375em;
+}
+
+/* ---------- 항목 행 ---------- */
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  margin: 0 -8px;
+  border-radius: var(--radius);
+  min-width: 0;
+}
+
+.row__box {
+  flex: none;
+  width: 1.375em;
+  height: 1.375em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 2px solid var(--surface-strong);
+  background: transparent;
+  transition: background 0.16s var(--ease), border-color 0.16s var(--ease);
+}
+
+.row__check {
+  width: 72%;
+  height: 72%;
+  fill: none;
+  stroke: #000;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+.row[data-done='true'] .row__box {
+  background: var(--brand-stronger);
+  border-color: var(--brand-stronger);
+}
+
+.row[data-done='true'] .row__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.row__label {
+  position: relative;
+  min-width: 0;
+  font-size: 1.0625em;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--text);
+  transition: color 0.2s var(--ease);
+  word-break: break-word;
+}
+
+/* 취소선을 width 0→100% 로 그어서 "지워지는" 느낌 */
+.row__label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.7;
+  transition: width 0.2s var(--ease);
+}
+
+.row[data-done='true'] .row__label {
+  color: var(--text-cool-weak);
+}
+
+.row[data-done='true'] .row__label::after {
+  width: 100%;
+}

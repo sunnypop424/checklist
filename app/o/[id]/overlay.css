@@ -1,0 +1,28 @@
+/* 오버레이 전용 — 배경은 반드시 투명하게 유지 */
+.overlay-root {
+  padding: 12px;
+}
+
+.overlay-debug {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-cool);
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  width: fit-content;
+}
+
+.overlay-debug__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+}
+.overlay-debug__dot[data-state='ok'] { background: var(--brand); }
+.overlay-debug__dot[data-state='poll'] { background: #d9ae41; }
+.overlay-debug__dot[data-state='stale'] { background: var(--danger); }
