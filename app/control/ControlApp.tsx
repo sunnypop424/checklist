@@ -244,23 +244,6 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     [optimistic]
   );
 
-  const move = useCallback(
-    (index: number, delta: number) => {
-      const target = index + delta;
-      if (target < 0 || target >= items.length || !activeId) return;
-      const next = [...items];
-      const tmp = next[index];
-      next[index] = next[target];
-      next[target] = tmp;
-      void optimistic(() => setItems(next), {
-        action: 'reorder_items',
-        listId: activeId,
-        ids: next.map((i) => i.id),
-      });
-    },
-    [activeId, items, optimistic]
-  );
-
   const addItem = useCallback(
     async (label: string) => {
       const text = label.trim();
@@ -484,22 +467,6 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
                     )}
 
                     <div className="erow__tools">
-                      <button
-                        className="icon"
-                        onClick={() => move(index, -1)}
-                        disabled={index === 0}
-                        title="위로"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        className="icon"
-                        onClick={() => move(index, 1)}
-                        disabled={index === items.length - 1}
-                        title="아래로"
-                      >
-                        ↓
-                      </button>
                       <button
                         className="icon icon--danger"
                         onClick={() => remove(item)}
