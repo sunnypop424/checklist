@@ -3,21 +3,30 @@
 import { useEffect, useState } from 'react';
 
 /**
- * URL 에 ?key= 가 없을 때 표시.
- * 이전에 접속한 적이 있으면 sessionStorage 의 키로 자동 재진입한다.
+ * URL 에 ?key= 가 없거나(=처음 방문) 키가 틀렸을 때 표시.
+ * 저장된 키가 있으면 자동으로 재진입한다.
+ *
+ * invalid 일 때는 저장된 키를 반드시 지운다. 안 그러면 틀린 키가 계속 자동
+ * 재진입을 일으켜 입력 폼에 영영 도달하지 못한다.
  */
-export default function Gate() {
+export default function Gate({ invalid }: { invalid?: boolean }) {
   const [value, setValue] = useState('');
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    if (invalid) {
+      localStorage.removeItem('control_key');
+      sessionStorage.removeItem('control_key');
+      setChecked(true);
+      return;
+    }
     const saved = sessionStorage.getItem('control_key') || localStorage.getItem('control_key');
     if (saved) {
       window.location.replace(`/control?key=${encodeURIComponent(saved)}`);
       return;
     }
     setChecked(true);
-  }, []);
+  }, [invalid]);
 
   if (!checked) return null;
 
@@ -34,7 +43,11 @@ export default function Gate() {
         }}
       >
         <h1>체크리스트 컨트롤</h1>
-        <p>비밀 키를 입력하세요. 이 브라우저에 저장되어 다음부터는 바로 열립니다.</p>
+        {invalid ? (
+          <p className="gate__error">비밀 키가 올바르지 않습니다. 다시 입력해 주세요.</p>
+        ) : (
+          <p>비밀 키를 입력하세요. 이 브라우저에 저장되어 다음부터는 바로 열립니다.</p>
+        )}
         <input
           type="password"
           className="gate__input"

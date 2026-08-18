@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { publicClient } from '@/lib/supabase';
+import { OVERLAY_ENV, missingEnv } from '@/lib/env';
 import type { Item, List } from '@/lib/types';
 import Overlay from './Overlay';
 
@@ -14,6 +15,9 @@ type Props = {
 export default async function OverlayPage({ params, searchParams }: Props) {
   const { id } = await params;
   const sp = await searchParams;
+
+  // 환경변수가 없으면 크래시 대신 조용히 빈 화면 — 방송 중 붉은 에러 화면이 뜨는 것보다 낫다
+  if (missingEnv(OVERLAY_ENV).length > 0) return null;
 
   const db = publicClient();
 

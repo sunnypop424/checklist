@@ -10,6 +10,21 @@ function bad(message: string, status = 400) {
   return NextResponse.json({ ok: false, error: message }, { status });
 }
 
+/** 오버레이 한 줄에 들어갈 수 있는 현실적인 상한 */
+const MAX_LABEL = 200;
+const MAX_TITLE = 60;
+
+/** 제어문자(줄바꿈·탭 포함). 붙여넣기 때 자주 섞여 들어온다. */
+const CONTROL_CHARS = /[\u0000-\u001f\u007f]+/g;
+
+function clean(text: string, max: number): string {
+  return text
+    .replace(CONTROL_CHARS, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
 export async function POST(req: Request) {
   if (!requireKey(req)) {
     return bad('인증 실패', 401);
@@ -37,7 +52,7 @@ export async function POST(req: Request) {
         const { data, error } = await db
           .from('lists')
           .insert({
-            title: body.title?.trim() || '새 체크리스트',
+            title: clean(body.title ?? '', MAX_TITLE) || '새 체크리스트',
             sort: (maxRow?.sort ?? -1) + 1,
           })
           .select()
@@ -49,7 +64,7 @@ export async function POST(req: Request) {
       case 'rename_list': {
         const { error } = await db
           .from('lists')
-          .update({ title: body.title.trim() || '체크리스트' })
+          .update({ title: clean(body.title, MAX_TITLE) || '체크리스트' })
           .eq('id', body.listId);
         if (error) throw error;
         return NextResponse.json({ ok: true });
@@ -72,7 +87,7 @@ export async function POST(req: Request) {
       }
 
       case 'add_item': {
-        const label = body.label.trim();
+        const label = clean(body.label, MAX_LABEL);
         if (!label) return bad('빈 항목');
 
         const { data: maxRow } = await db
@@ -99,7 +114,7 @@ export async function POST(req: Request) {
       case 'update_item': {
         const patch: Record<string, unknown> = {};
         if (typeof body.label === 'string') {
-          const label = body.label.trim();
+          const label = clean(body.label, MAX_LABEL);
           if (!label) return bad('빈 항목');
           patch.label = label;
         }
@@ -118,6 +133,7 @@ export async function POST(req: Request) {
       }
 
       case 'reorder_items': {
+        if (!Array.isArray(body.ids) || body.ids.length === 0) return bad('빈 순서 배열');
         const { error } = await db.rpc('reorder_items', {
           p_list_id: body.listId,
           p_ids: body.ids,

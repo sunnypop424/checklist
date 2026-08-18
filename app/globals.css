@@ -95,7 +95,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: var(--shadow-card);
   color: var(--text);
-  font-size: 1rem;
+  /* rem 이 아니라 em — 부모(.overlay-root)의 font-size 를 물려받아야
+     ?scale= 배율이 실제로 적용된다. rem 은 루트 기준이라 배율을 무시한다. */
+  font-size: 1em;
 }
 
 /* 전부 완료되면 테두리와 마크만 브랜드 그린으로 (패널은 다크 유지 = 게임 위 가독성) */
@@ -258,6 +260,8 @@ body {
   font-weight: 600;
   color: var(--text);
   transition: color 0.2s var(--ease);
+  /* 공백 없는 긴 URL 이 들어와도 패널 밖으로 삐져나가지 않게 */
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -290,6 +294,8 @@ body {
 
 .overlay-root {
   height: 100%;
+  /* 배율의 기준점. 인라인 style 의 font-size 가 이 값을 덮어쓴다. */
+  font-size: 1rem;
   padding: 12px;
   display: flex;
   flex-direction: column;

@@ -1,9 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { publicClient } from '@/lib/supabase';
 import type { Item, List, MutateAction } from '@/lib/types';
 import ChecklistPanel from '@/components/ChecklistPanel';
+import OverlayOptionsPanel from './OverlayOptions';
+import {
+  DEFAULT_OPTIONS,
+  buildOverlayPath,
+  loadOptions,
+  saveOptions,
+  type OverlayOptions,
+} from '@/lib/overlayOptions';
 
 type Props = {
   controlKey: string;
@@ -16,11 +25,15 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showOptions, setShowOptions] = useState(true);
   const [showPreview, setShowPreview] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [renamingList, setRenamingList] = useState(false);
+  const [options, setOptions] = useState<OverlayOptions>(DEFAULT_OPTIONS);
 
   const addInputRef = useRef<HTMLInputElement>(null);
+  /** 내가 방금 보낸 변경이 실시간 이벤트로 되돌아와 낙관적 상태를 덮어쓰지 않게 하는 가드 */
+  const mutatedAt = useRef(0);
 
   // 키를 저장하고 주소창을 정리한다 (방송 중 브라우저가 화면에 잡혀도 키가 안 보이게)
   useEffect(() => {
@@ -40,6 +53,39 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   useEffect(() => {
     if (activeId) localStorage.setItem('active_list_id', activeId);
   }, [activeId]);
+
+  // 패널 접힘 상태 복원
+  useEffect(() => {
+    setShowOptions(localStorage.getItem('show_options') !== '0');
+    setShowPreview(localStorage.getItem('show_preview') !== '0');
+  }, []);
+
+  const toggleOptions = useCallback(() => {
+    setShowOptions((v) => {
+      localStorage.setItem('show_options', v ? '0' : '1');
+      return !v;
+    });
+  }, []);
+
+  const togglePreview = useCallback(() => {
+    setShowPreview((v) => {
+      localStorage.setItem('show_preview', v ? '0' : '1');
+      return !v;
+    });
+  }, []);
+
+  // 옵션은 리스트마다 따로 기억한다 (리스트별로 OBS 소스가 다를 수 있다)
+  useEffect(() => {
+    setOptions(activeId ? loadOptions(activeId) : DEFAULT_OPTIONS);
+  }, [activeId]);
+
+  const updateOptions = useCallback(
+    (next: OverlayOptions) => {
+      setOptions(next);
+      if (activeId) saveOptions(activeId, next);
+    },
+    [activeId]
+  );
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -83,6 +129,40 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     return () => window.removeEventListener('focus', onFocus);
   }, [activeId, loadItems, loadLists]);
 
+  // 다른 기기(폰)에서 바꾼 내용을 실시간으로 받는다.
+  // 내가 방금 보낸 변경(1.5초 이내)은 무시한다 — 낙관적 UI 가 되돌아가 깜빡이는 걸 막는다.
+  useEffect(() => {
+    if (!activeId) return;
+    const db = publicClient();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let channel: RealtimeChannel | null = null;
+
+    const onChange = () => {
+      if (Date.now() - mutatedAt.current < 1500) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (Date.now() - mutatedAt.current < 1500) return;
+        void loadItems(activeId);
+        void loadLists();
+      }, 250);
+    };
+
+    channel = db
+      .channel(`control:${activeId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'items', filter: `list_id=eq.${activeId}` },
+        onChange
+      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lists' }, onChange)
+      .subscribe();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      if (channel) void db.removeChannel(channel);
+    };
+  }, [activeId, loadItems, loadLists]);
+
   // ── 서버 호출 ──────────────────────────────────────────────
   const send = useCallback(
     async (payload: MutateAction) => {
@@ -92,6 +172,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
         body: JSON.stringify(payload),
       });
       const json = await res.json().catch(() => ({ ok: false, error: '응답 파싱 실패' }));
+      mutatedAt.current = Date.now();
       if (!res.ok || !json.ok) throw new Error(json.error || `HTTP ${res.status}`);
       return json;
     },
@@ -234,7 +315,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
 
   const copyOverlayUrl = useCallback(() => {
     if (!activeId) return;
-    const url = `${window.location.origin}/o/${activeId}`;
+    const url = `${window.location.origin}${buildOverlayPath(activeId, options)}`;
     void navigator.clipboard.writeText(url).then(
       () => {
         setCopied(true);
@@ -242,7 +323,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
       },
       () => showToast(`복사 실패. 직접 복사하세요: ${url}`)
     );
-  }, [activeId, showToast]);
+  }, [activeId, options, showToast]);
 
   // ── 숫자키 1~9 로 N번째 항목 토글 ──────────────────────────
   useEffect(() => {
@@ -264,6 +345,8 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
 
   const activeList = lists.find((l) => l.id === activeId) ?? null;
   const doneCount = items.filter((i) => i.done).length;
+  // 미리보기 칼럼 폭에 맞춘 축소 비율 (소스가 더 크면 줄여서 보여준다)
+  const fit = Math.min(1, 420 / options.width);
 
   return (
     <main className="control">
@@ -330,11 +413,10 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               <button className="btn" onClick={copyOverlayUrl}>
                 {copied ? '복사됨 ✓' : 'OBS URL 복사'}
               </button>
-              <button
-                className="btn"
-                onClick={() => setShowPreview((v) => !v)}
-                aria-pressed={showPreview}
-              >
+              <button className="btn" onClick={toggleOptions} aria-pressed={showOptions}>
+                옵션 {showOptions ? '끄기' : '켜기'}
+              </button>
+              <button className="btn" onClick={togglePreview} aria-pressed={showPreview}>
                 미리보기 {showPreview ? '끄기' : '켜기'}
               </button>
               <button className="btn btn--danger" onClick={deleteList}>
@@ -343,7 +425,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
             </div>
           </section>
 
-          <div className="control__body">
+          <div className="control__body" data-aside={showOptions || showPreview ? 'true' : 'false'}>
             {/* ── 항목 편집 ── */}
             <section className="editor">
               <ul className="editor__list">
@@ -447,18 +529,54 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               </p>
             </section>
 
-            {/* ── 미리보기 ── */}
-            {showPreview && (
+            {/* ── 옵션 + 미리보기 ── */}
+            {(showOptions || showPreview) && (
               <section className="preview">
-                <div className="preview__label">OBS 에 나가는 화면 (420 × 720)</div>
-                <div className="preview__stage">
-                  <div className="overlay-root">
-                    <ChecklistPanel title={activeList.title} items={items} />
-                  </div>
-                </div>
-                <div className="preview__url">
-                  <code>/o/{activeList.id}</code>
-                </div>
+                {showOptions && (
+                  <OverlayOptionsPanel
+                    value={options}
+                    onChange={updateOptions}
+                    onReset={() => updateOptions(DEFAULT_OPTIONS)}
+                    urlPath={buildOverlayPath(activeList.id, options)}
+                    copied={copied}
+                    onCopy={copyOverlayUrl}
+                  />
+                )}
+
+                {showPreview && (
+                  <>
+                    <div className="preview__label">
+                      미리보기
+                      <span className="preview__dim">
+                        {options.width} × {options.height}
+                        {fit < 1 && ` · ${Math.round(fit * 100)}% 축소 표시`}
+                      </span>
+                    </div>
+
+                    {/* 실제 소스 크기 그대로 그린 뒤, 칼럼에 안 들어가면 통째로 축소한다 */}
+                    <div className="preview__frame" style={{ height: options.height * fit }}>
+                      <div
+                        className="preview__stage"
+                        style={{
+                          width: options.width,
+                          height: options.height,
+                          transform: fit < 1 ? `scale(${fit})` : undefined,
+                        }}
+                      >
+                        <div className="overlay-root" style={{ fontSize: `${options.scale}rem` }}>
+                          <ChecklistPanel
+                            title={activeList.title}
+                            items={items}
+                            hideDone={options.hideDone}
+                            hideProgress={options.hideProgress}
+                            sortDone={options.sortDone}
+                            hideEmpty={options.hideEmpty}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </section>
             )}
           </div>
@@ -470,7 +588,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
                 소스 추가 → <b>브라우저</b>, URL 은 위 <b>OBS URL 복사</b> 버튼으로 복사한 주소
               </li>
               <li>
-                너비 <b>420</b>, 높이 <b>720</b>
+                너비 <b>{options.width}</b>, 높이 <b>{options.height}</b> (위 옵션에서 바꿀 수 있습니다)
               </li>
               <li>
                 <b>소스가 보이지 않을 때 종료</b> 체크 해제
@@ -484,8 +602,9 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               <li>사용자 지정 CSS 는 기본값 그대로 둘 것</li>
             </ol>
             <p className="help__note">
-              글자를 키우려면 OBS 변형 핸들로 늘리지 말고 URL 뒤에 <code>?scale=1.25</code> 를 붙이고
-              소스 속성의 너비·높이를 키우세요. 동기화 상태를 확인하려면 <code>?debug=1</code>.
+              글자 크기는 OBS 변형 핸들로 늘리지 마세요 — 소스 해상도로 렌더한 걸 OBS 가 다시
+              늘리기 때문에 글자가 뭉개집니다. 위 <b>오버레이 옵션</b>에서 글자 크기와 소스 크기를
+              바꾸면 어느 크기에서도 선명합니다.
             </p>
           </section>
         </>
