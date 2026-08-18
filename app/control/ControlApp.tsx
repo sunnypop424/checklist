@@ -32,6 +32,9 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   const [options, setOptions] = useState<OverlayOptions>(DEFAULT_OPTIONS);
 
   const addInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLElement>(null);
+  /** 미리보기 칼럼의 실제 너비 — 창 크기에 따라 미리보기를 축소하는 기준 */
+  const [previewWidth, setPreviewWidth] = useState(420);
   /** 내가 방금 보낸 변경이 실시간 이벤트로 되돌아와 낙관적 상태를 덮어쓰지 않게 하는 가드 */
   const mutatedAt = useRef(0);
 
@@ -53,6 +56,18 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   useEffect(() => {
     if (activeId) localStorage.setItem('active_list_id', activeId);
   }, [activeId]);
+
+  // 미리보기 칼럼 폭을 실제로 재서 축소 비율을 정한다.
+  // 고정값(420)으로 계산하면 창이 좁아졌을 때 미리보기가 잘려나간다.
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el) return;
+    const measure = () => setPreviewWidth(el.clientWidth || 420);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [showOptions, showPreview]);
 
   // 패널 접힘 상태 복원
   useEffect(() => {
@@ -346,7 +361,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
   const activeList = lists.find((l) => l.id === activeId) ?? null;
   const doneCount = items.filter((i) => i.done).length;
   // 미리보기 칼럼 폭에 맞춘 축소 비율 (소스가 더 크면 줄여서 보여준다)
-  const fit = Math.min(1, 420 / options.width);
+  const fit = Math.min(1, previewWidth / options.width);
 
   return (
     <main className="control">
@@ -531,7 +546,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
 
             {/* ── 옵션 + 미리보기 ── */}
             {(showOptions || showPreview) && (
-              <section className="preview">
+              <section className="preview" ref={previewRef}>
                 {showOptions && (
                   <OverlayOptionsPanel
                     value={options}

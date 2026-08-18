@@ -233,6 +233,11 @@
   .control__body {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* 한 칼럼이 되면 sticky 가 의미 없다 */
+  .preview {
+    position: static;
+  }
 }
 
 /* ---------- 항목 편집 ---------- */
@@ -616,6 +621,23 @@
 @media (max-width: 640px) {
   .control {
     padding: 14px 12px 48px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .opts__row {
+    gap: 5px;
+  }
+  .chip {
+    font-size: 11px;
+    padding: 0 9px;
+  }
+  .opts__out {
+    flex-wrap: wrap;
+  }
+  .opts__copy {
+    width: 100%;
   }
   .erow {
     padding: 10px;
