@@ -61,8 +61,13 @@ export type PalMon = {
   foreman: string | null;
   partner: string | null;
   source: string | null;
-  /** 잡는 게 아니라 배합으로 얻는 팰. 이 부모들을 먼저 확보해야 한다. */
+  /** 배합기에 넣는 부모. 알파 세크메트는 세크메트끼리 배합한다. */
   breed_from?: string[];
+  /**
+   * 배합기에 넣는 게 아니라 "소지만 하고 있으면" 되는 조건 팰.
+   * 라브라돈·스프라돈 풀농축 2마리를 갖고 있으면 알파가 100% 나온다.
+   */
+  breed_requires?: string[];
   breed_note?: string | null;
 };
 
@@ -180,8 +185,10 @@ export type PalCatchLine = {
   short: number;
   /** 'catch' 직접 포획 / 'breed' 배합으로 양산 */
   via: 'catch' | 'breed';
-  /** 배합 부모 중 아직 확보하지 못한 것 */
+  /** 배합기에 넣을 부모 중 아직 확보하지 못한 것 */
   missingParents: PalMon[];
+  /** 소지만 하면 되는 조건 팰 중 아직 없는 것 (알파 확률 100% 조건) */
+  missingConditions: PalMon[];
   note: string | null;
 };
 

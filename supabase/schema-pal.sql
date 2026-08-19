@@ -91,11 +91,16 @@ create table if not exists public.pal_pals (
   foreman   text,          -- 작업반장 적성 (배치만 해도 +1)
   partner   text,
   source    text,
-  -- 잡는 게 아니라 배합으로 얻는 팰. 이 부모들을 먼저 확보해야 한다.
+  -- 잡는 게 아니라 배합으로 얻는 팰. 이 부모를 배합기에 넣어야 한다.
   breed_from text[] not null default '{}',
+  -- 배합기에 넣는 게 아니라 "소지만 하고 있으면" 되는 조건 팰.
+  -- 알파 세크메트는 세크메트끼리 배합하되, 라브라돈·스프라돈 풀농축 2마리를
+  -- 갖고 있으면 알파가 100% 확률로 나온다. 부모와는 역할이 전혀 다르다.
+  breed_requires text[] not null default '{}',
   breed_note text
 );
 alter table public.pal_pals add column if not exists breed_from text[] not null default '{}';
+alter table public.pal_pals add column if not exists breed_requires text[] not null default '{}';
 alter table public.pal_pals add column if not exists breed_note text;
 
 create table if not exists public.pal_assignments (
@@ -485,9 +490,10 @@ insert into public.pal_structure_unlocks (structure_id, item_id) values
 -- ---------- 팰 (설계도 9장) ----------
 
 insert into public.pal_pals (id, name, aptitudes, nocturnal, foreman, partner, source) values
-  -- 알파 세크메트 배합 부모 (풀농축해서 엔트리에 1마리씩)
-  ('labradon',     '라브라돈',      '{}', false, null, '알파 세크메트 배합 부모. 풀농축 필요.', null),
-  ('spradon',      '스프라돈',      '{}', false, null, '알파 세크메트 배합 부모. 풀농축 필요.', null),
+  -- 알파 세크메트 관련
+  ('sekhmet',      '세크메트',      '{}', false, null, '알파 세크메트 배합 부모. 세크메트끼리 배합한다.', null),
+  ('labradon',     '라브라돈',      '{}', false, null, '풀농축 상태로 소지하면 알파 확률 100% (배합기에 넣는 게 아님)', null),
+  ('spradon',      '스프라돈',      '{}', false, null, '풀농축 상태로 소지하면 알파 확률 100% (배합기에 넣는 게 아님)', null),
   ('eophwamu',     '업화무',        '{"kindling":8}',                       false, null, null, '세계수 이후'),
   ('senko',        '센코',          '{"kindling":6,"handiwork":6}',         false, null, '불+수작업 겸업', '천양향 필드 보스'),
   ('bulchorong',   '불초롱',        '{"kindling":6,"watering":6}',          false, null, '불+관개 겸업', null),
@@ -540,11 +546,13 @@ on conflict (id) do update set
   foreman = excluded.foreman, partner = excluded.partner, source = excluded.source;
 
 -- 알파 세크메트는 잡는 게 아니라 배합으로 양산한다.
--- 라브라돈·스프라돈을 풀농축해 엔트리에 1마리씩 넣어두고 알을 줍는 방식이라,
--- "세크메트 13마리 포획"이 아니라 "부모 2마리 풀농축"이 먼저 떠야 한다.
+--   배합기에 넣는 부모  : 세크메트 × 세크메트 (동종 배합)
+--   소지만 하면 되는 조건: 라브라돈·스프라돈 풀농축 각 1마리 → 알파 100%
+-- 둘을 섞으면 안 된다. 라브라돈을 배합기에 넣는 게 아니다.
 update public.pal_pals
-   set breed_from = '{labradon,spradon}',
-       breed_note = '라브라돈·스프라돈을 풀농축해 엔트리에 1마리씩 넣고 알을 줍는다'
+   set breed_from     = '{sekhmet}',
+       breed_requires = '{labradon,spradon}',
+       breed_note     = '세크메트끼리 배합. 라브라돈·스프라돈 풀농축 2마리를 소지하면 알파 100%'
  where id = 'alpha_sekhmet';
 
 -- ---------- 팰 배치 (설계도 5~8장) ----------

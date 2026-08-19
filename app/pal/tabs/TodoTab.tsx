@@ -205,11 +205,15 @@ export default function TodoTab({
                       </small>
                       {c.missingParents.length > 0 && (
                         <small className="task__blocked">
-                          먼저 {c.missingParents.map((p) => p.name).join(' · ')} 확보
-                          {c.note ? ` — ${c.note}` : ''}
+                          배합 부모: {c.missingParents.map((p) => p.name).join(' · ')} 필요
                         </small>
                       )}
-                      {c.missingParents.length === 0 && c.note && <small>{c.note}</small>}
+                      {c.missingConditions.length > 0 && (
+                        <small className="task__blocked">
+                          소지 조건: {c.missingConditions.map((p) => p.name).join(' · ')} 풀농축 필요
+                        </small>
+                      )}
+                      {c.note && <small>{c.note}</small>}
                     </div>
                     <button
                       className="btn btn--sm"

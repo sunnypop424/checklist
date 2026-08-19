@@ -205,25 +205,42 @@ describe('배치표', () => {
     expect(p.palNeeds.reduce((s, n) => s + n.need, 0)).toBe(80);
   });
 
-  it('알파 세크메트는 잡는 게 아니라 배합이고, 부모 확보가 먼저 뜬다', () => {
+  it('알파 세크메트는 세크메트끼리 배합한다 (부모와 소지 조건은 별개)', () => {
     const p = plan(live, {}, {}, crew, {});
-    const sekhmet = p.palCatches.find((c) => c.pal.id === 'alpha_sekhmet')!;
+    const alpha = p.palCatches.find((c) => c.pal.id === 'alpha_sekhmet')!;
 
-    expect(sekhmet.via).toBe('breed');
-    expect(sekhmet.missingParents.map((x) => x.id).sort()).toEqual(['labradon', 'spradon']);
-
-    // 부모 줄이 자식보다 앞에 있어야 한다
-    const parentIdx = p.palCatches.findIndex((c) => c.pal.id === 'labradon');
-    const childIdx = p.palCatches.findIndex((c) => c.pal.id === 'alpha_sekhmet');
-    expect(parentIdx).toBeGreaterThanOrEqual(0);
-    expect(parentIdx).toBeLessThan(childIdx);
-    expect(p.palCatches.find((c) => c.pal.id === 'labradon')!.short).toBe(1);
+    expect(alpha.via).toBe('breed');
+    // 배합기에 넣는 부모는 세크메트뿐
+    expect(alpha.missingParents.map((x) => x.id)).toEqual(['sekhmet']);
+    // 라브라돈·스프라돈은 배합기에 넣는 게 아니라 소지만 하면 되는 조건
+    expect(alpha.missingConditions.map((x) => x.id).sort()).toEqual(['labradon', 'spradon']);
   });
 
-  it('부모를 확보하면 부모 줄이 사라진다', () => {
-    const p = plan(live, {}, {}, crew, { labradon: 1, spradon: 1 });
-    expect(p.palCatches.some((c) => c.pal.id === 'labradon')).toBe(false);
-    expect(p.palCatches.find((c) => c.pal.id === 'alpha_sekhmet')!.missingParents).toEqual([]);
+  it('동종 배합이라 세크메트는 2마리(암수), 소지 조건은 1마리씩', () => {
+    const p = plan(live, {}, {}, crew, {});
+    expect(p.palCatches.find((c) => c.pal.id === 'sekhmet')!.short).toBe(2);
+    expect(p.palCatches.find((c) => c.pal.id === 'labradon')!.short).toBe(1);
+    expect(p.palCatches.find((c) => c.pal.id === 'spradon')!.short).toBe(1);
+  });
+
+  it('선행 줄이 알파보다 앞에 온다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const alphaIdx = p.palCatches.findIndex((c) => c.pal.id === 'alpha_sekhmet');
+    for (const id of ['sekhmet', 'labradon', 'spradon']) {
+      const idx = p.palCatches.findIndex((c) => c.pal.id === id);
+      expect(idx, id).toBeGreaterThanOrEqual(0);
+      expect(idx, id).toBeLessThan(alphaIdx);
+    }
+  });
+
+  it('선행을 전부 갖추면 선행 줄이 사라진다', () => {
+    const p = plan(live, {}, {}, crew, { sekhmet: 2, labradon: 1, spradon: 1 });
+    for (const id of ['sekhmet', 'labradon', 'spradon']) {
+      expect(p.palCatches.some((c) => c.pal.id === id), id).toBe(false);
+    }
+    const alpha = p.palCatches.find((c) => c.pal.id === 'alpha_sekhmet')!;
+    expect(alpha.missingParents).toEqual([]);
+    expect(alpha.missingConditions).toEqual([]);
   });
 
   it('잡은 팰은 가중치 높은 거점부터 배정된다', () => {

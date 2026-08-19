@@ -12,10 +12,13 @@
       "partner": "작업 속도 400%. 제약이 없어 고대 작업대에는 못 들어간다.",
       "source": null,
       "breed_from": [
+        "sekhmet"
+      ],
+      "breed_note": "세크메트끼리 배합. 라브라돈·스프라돈 풀농축 2마리를 소지하면 알파 100%",
+      "breed_requires": [
         "labradon",
         "spradon"
-      ],
-      "breed_note": "라브라돈·스프라돈을 풀농축해 엔트리에 1마리씩 넣고 알을 줍는다"
+      ]
     },
     {
       "id": "anubis",
@@ -29,7 +32,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "azuribi",
@@ -42,7 +46,8 @@
       "partner": "관개 전념",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "beautiflower",
@@ -55,7 +60,8 @@
       "partner": "작물 성장 속도 +70%",
       "source": "벚꽃섬",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "bellaruju",
@@ -69,7 +75,8 @@
       "partner": "즉시 전력이 필요하면 레이드로 확보",
       "source": "레이드",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "bingcheonma",
@@ -82,7 +89,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "binghouger",
@@ -97,7 +105,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "bittersheep",
@@ -110,7 +119,8 @@
       "partner": "포만도 감소 -15%. 양털.",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "bloodcatty",
@@ -123,7 +133,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "brooming",
@@ -134,7 +145,8 @@
       "partner": "채집 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "bulchorong",
@@ -148,7 +160,8 @@
       "partner": "불+관개 겸업",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "candysheep",
@@ -161,7 +174,8 @@
       "partner": "포만도 감소 -10%. 양털.",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "cattywizard",
@@ -172,7 +186,8 @@
       "partner": "불 피우기 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "cosmodial",
@@ -185,7 +200,8 @@
       "partner": "육성 가치 낮음 — 목재는 구매",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "dalbomi",
@@ -199,7 +215,8 @@
       "partner": "어둠 속성이라 야행성",
       "source": "천양향 필드 보스",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "eophwamu",
@@ -212,7 +229,8 @@
       "partner": null,
       "source": "세계수 이후",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "florina",
@@ -223,7 +241,8 @@
       "partner": "파종 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "gwiyobi",
@@ -234,7 +253,8 @@
       "partner": "목장 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "jetragon",
@@ -247,7 +267,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "jjariring",
@@ -258,7 +279,8 @@
       "partner": "발전 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "labradon",
@@ -266,10 +288,11 @@
       "aptitudes": {},
       "nocturnal": false,
       "foreman": null,
-      "partner": "알파 세크메트 배합 부모. 풀농축 필요.",
+      "partner": "풀농축 상태로 소지하면 알파 확률 100% (배합기에 넣는 게 아님)",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "lilin",
@@ -284,7 +307,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "liorine",
@@ -295,7 +319,8 @@
       "partner": "관개 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "lunarin",
@@ -308,7 +333,8 @@
       "partner": "책 1권만 먹이면 수작업 6",
       "source": "벚꽃섬",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "magmakaiser",
@@ -322,7 +348,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "magnite",
@@ -336,7 +363,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "milcow",
@@ -349,7 +377,8 @@
       "partner": "우유",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "monochrona",
@@ -362,7 +391,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "moslon",
@@ -375,7 +405,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "musully",
@@ -386,7 +417,8 @@
       "partner": "제약 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "noksaju",
@@ -399,7 +431,8 @@
       "partner": null,
       "source": "세계수 레이드",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "nundaengi",
@@ -410,7 +443,8 @@
       "partner": "냉각 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "nureumbuk",
@@ -421,7 +455,8 @@
       "partner": "채굴 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "nyangbat",
@@ -435,7 +470,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "pingto",
@@ -446,7 +482,8 @@
       "partner": "수작업 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "plumlin",
@@ -460,7 +497,8 @@
       "partner": "풀농축 시 수확량 +35%",
       "source": "천락의 땅",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "pullesio",
@@ -474,7 +512,8 @@
       "partner": "알 생산 +20%",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "raigaruda",
@@ -487,7 +526,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "sanryeong",
@@ -498,7 +538,20 @@
       "partner": "벌목 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
+    },
+    {
+      "id": "sekhmet",
+      "name": "세크메트",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "알파 세크메트 배합 부모. 세크메트끼리 배합한다.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "senko",
@@ -512,7 +565,8 @@
       "partner": "불+수작업 겸업",
       "source": "천양향 필드 보스",
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "shaolong",
@@ -526,7 +580,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "shellgadra",
@@ -539,7 +594,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "shogunbokchi",
@@ -553,7 +609,8 @@
       "partner": "풀농축하면 관개 6이 되어 재배기까지 잡는다. 농축 3단계에서 멈출 것.",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "spradon",
@@ -561,10 +618,11 @@
       "aptitudes": {},
       "nocturnal": false,
       "foreman": null,
-      "partner": "알파 세크메트 배합 부모. 풀농축 필요.",
+      "partner": "풀농축 상태로 소지하면 알파 확률 100% (배합기에 넣는 게 아님)",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "terranite",
@@ -578,7 +636,8 @@
       "partner": null,
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "umpo",
@@ -591,7 +650,8 @@
       "partner": "운반 반장",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "violeta",
@@ -604,7 +664,8 @@
       "partner": "6종 겸업",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     },
     {
       "id": "voljex",
@@ -618,12 +679,13 @@
       "partner": "불면 필수",
       "source": null,
       "breed_from": [],
-      "breed_note": null
+      "breed_note": null,
+      "breed_requires": []
     }
   ],
   "assignments": [
     {
-      "id": "121",
+      "id": "151",
       "base_id": 1,
       "role": "불 피우기 6+ (화로)",
       "count": 2,
@@ -635,7 +697,7 @@
       "note": "세계수 이후 업화무로 교체"
     },
     {
-      "id": "122",
+      "id": "152",
       "base_id": 1,
       "role": "냉각 6+ (화로)",
       "count": 2,
@@ -647,7 +709,7 @@
       "note": null
     },
     {
-      "id": "123",
+      "id": "153",
       "base_id": 1,
       "role": "수작업 6+ (고대 작업대)",
       "count": 2,
@@ -659,7 +721,7 @@
       "note": "알파 세크메트는 제약이 없어 여기엔 못 들어간다"
     },
     {
-      "id": "124",
+      "id": "154",
       "base_id": 1,
       "role": "제약 6+ (고대 작업대)",
       "count": 2,
@@ -671,7 +733,7 @@
       "note": null
     },
     {
-      "id": "125",
+      "id": "155",
       "base_id": 1,
       "role": "수작업 (작업 공장, 4자리)",
       "count": 4,
@@ -682,7 +744,7 @@
       "note": "작업 속도 400%. 모노크로나 대신 알파 세크메트로 통일."
     },
     {
-      "id": "126",
+      "id": "156",
       "base_id": 1,
       "role": "수작업 (무기 공장, 4자리)",
       "count": 4,
@@ -694,7 +756,7 @@
       "note": "알파 세크메트 우선, 모자라면 아누비스"
     },
     {
-      "id": "127",
+      "id": "157",
       "base_id": 1,
       "role": "발전 6+",
       "count": 1,
@@ -705,7 +767,7 @@
       "note": null
     },
     {
-      "id": "128",
+      "id": "158",
       "base_id": 1,
       "role": "관개",
       "count": 1,
@@ -716,7 +778,7 @@
       "note": null
     },
     {
-      "id": "129",
+      "id": "159",
       "base_id": 1,
       "role": "운반",
       "count": 1,
@@ -727,7 +789,7 @@
       "note": "산출물이 쌓이면 ②의 운반 팰을 잠깐 빌려온다"
     },
     {
-      "id": "130",
+      "id": "160",
       "base_id": 1,
       "role": "반장",
       "count": 1,
@@ -738,7 +800,7 @@
       "note": "공장 8자리를 전부 강화하므로 여기가 가장 이득"
     },
     {
-      "id": "131",
+      "id": "161",
       "base_id": 2,
       "role": "물질 생성기 (5대 × 1마리)",
       "count": 5,
@@ -750,7 +812,7 @@
       "note": "채굴 6 필요"
     },
     {
-      "id": "132",
+      "id": "162",
       "base_id": 2,
       "role": "대형 부엌 (불 피우기)",
       "count": 1,
@@ -761,7 +823,7 @@
       "note": null
     },
     {
-      "id": "133",
+      "id": "163",
       "base_id": 2,
       "role": "발전 6+",
       "count": 2,
@@ -772,7 +834,7 @@
       "note": null
     },
     {
-      "id": "134",
+      "id": "164",
       "base_id": 2,
       "role": "관개",
       "count": 1,
@@ -783,7 +845,7 @@
       "note": null
     },
     {
-      "id": "135",
+      "id": "165",
       "base_id": 2,
       "role": "운반",
       "count": 4,
@@ -796,7 +858,7 @@
       "note": null
     },
     {
-      "id": "136",
+      "id": "166",
       "base_id": 2,
       "role": "반장",
       "count": 3,
@@ -809,7 +871,7 @@
       "note": null
     },
     {
-      "id": "137",
+      "id": "167",
       "base_id": 2,
       "role": "교대 예비",
       "count": 4,
@@ -818,7 +880,7 @@
       "note": "야행성 개체"
     },
     {
-      "id": "138",
+      "id": "168",
       "base_id": 3,
       "role": "파종 6+",
       "count": 4,
@@ -831,7 +893,7 @@
       "note": "플럼린·뷰티플라워는 농축 + 응용학 책 투자 필요"
     },
     {
-      "id": "139",
+      "id": "169",
       "base_id": 3,
       "role": "채집 6+",
       "count": 3,
@@ -843,7 +905,7 @@
       "note": null
     },
     {
-      "id": "140",
+      "id": "170",
       "base_id": 3,
       "role": "관개 6+ (재배기·부엌 순회)",
       "count": 2,
@@ -854,7 +916,7 @@
       "note": null
     },
     {
-      "id": "141",
+      "id": "171",
       "base_id": 3,
       "role": "부엌 (불 6 + 수작업 6)",
       "count": 2,
@@ -865,7 +927,7 @@
       "note": "수작업은 농사 팰이 비는 시간에 겸업"
     },
     {
-      "id": "142",
+      "id": "172",
       "base_id": 3,
       "role": "목장",
       "count": 4,
@@ -878,7 +940,7 @@
       "note": null
     },
     {
-      "id": "143",
+      "id": "173",
       "base_id": 3,
       "role": "발전 6+",
       "count": 2,
@@ -889,7 +951,7 @@
       "note": "농축은 3단계에서 멈출 것 — 풀농축하면 관개 6이 되어 재배기까지 잡는다"
     },
     {
-      "id": "144",
+      "id": "174",
       "base_id": 3,
       "role": "반장",
       "count": 3,
@@ -902,7 +964,7 @@
       "note": null
     },
     {
-      "id": "145",
+      "id": "175",
       "base_id": 4,
       "role": "배합 부모 (3대 × 암수)",
       "count": 6,
@@ -911,7 +973,7 @@
       "note": "목표 조합에 맞춰 교체"
     },
     {
-      "id": "146",
+      "id": "176",
       "base_id": 4,
       "role": "발전 6+",
       "count": 4,
@@ -923,7 +985,7 @@
       "note": "불면 필수"
     },
     {
-      "id": "147",
+      "id": "177",
       "base_id": 4,
       "role": "관개",
       "count": 2,
@@ -935,7 +997,7 @@
       "note": null
     },
     {
-      "id": "148",
+      "id": "178",
       "base_id": 4,
       "role": "운반",
       "count": 2,
@@ -946,7 +1008,7 @@
       "note": null
     },
     {
-      "id": "149",
+      "id": "179",
       "base_id": 4,
       "role": "반장",
       "count": 1,
@@ -957,7 +1019,7 @@
       "note": null
     },
     {
-      "id": "150",
+      "id": "180",
       "base_id": 4,
       "role": "교대 예비",
       "count": 5,

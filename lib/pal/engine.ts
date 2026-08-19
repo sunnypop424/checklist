@@ -489,9 +489,11 @@ export function palNeeds(roster: PalRoster, bases: PalBase[], owned: OwnedPals):
 /**
  * 자리별 부족을 팰 종류별로 뒤집어 "확보해야 할 목록" 으로 만든다.
  *
- * 배합으로 얻는 팰(알파 세크메트 등)은 잡는 게 아니라 부모를 풀농축해 엔트리에
- * 넣고 알을 줍는 방식이다. 그래서 부모가 없으면 자식 13마리를 띄우는 게 아니라
- * **부모 확보를 먼저** 띄워야 한다.
+ * 배합으로 얻는 팰은 선행이 두 종류라 섞으면 안 된다.
+ *   breed_from     — 배합기에 실제로 넣는 부모 (알파 세크메트는 세크메트끼리)
+ *   breed_requires — 배합기에 넣는 게 아니라 소지만 하면 되는 조건 팰
+ *                    (라브라돈·스프라돈 풀농축 2마리 → 알파 100%)
+ * 둘 다 없으면 자식 13마리를 띄우는 게 아니라 선행 확보를 먼저 띄운다.
  */
 export function palCatchList(
   needs: PalNeed[],
@@ -500,20 +502,24 @@ export function palCatchList(
 ): PalCatchLine[] {
   const palById = byId(pals);
   const byPal = new Map<string, PalCatchLine>();
+  const has = (id: string) => (owned[id] ?? 0) >= 1;
+  const lookup = (ids: string[] | undefined) => (ids ?? []).map((id) => palById[id]).filter(Boolean);
 
   for (const n of needs) {
     if (n.short <= 0 || n.toCatch.length === 0) continue;
     // 후보가 여럿이면 첫 번째(=설계도의 최상위 추천)를 대표로 센다.
     // 전부 세면 "확보해야 할 팰"이 실제 필요보다 몇 배로 부풀어 오른다.
     const primary = n.toCatch[0];
-    const parents = (primary.breed_from ?? []).map((id) => palById[id]).filter(Boolean);
+    const parents = lookup(primary.breed_from);
+    const conditions = lookup(primary.breed_requires);
     const cur = byPal.get(primary.id) ?? {
       pal: primary,
       owned: owned[primary.id] ?? 0,
       roles: [],
       short: 0,
       via: parents.length > 0 ? ('breed' as const) : ('catch' as const),
-      missingParents: parents.filter((p) => (owned[p.id] ?? 0) < 1),
+      missingParents: parents.filter((p) => !has(p.id)),
+      missingConditions: conditions.filter((p) => !has(p.id)),
       note: primary.breed_note ?? null,
     };
     cur.short += n.short;
@@ -523,31 +529,40 @@ export function palCatchList(
 
   const lines = [...byPal.values()];
 
-  // 배합 부모는 자식보다 먼저 확보해야 하므로 별도 줄로 앞에 세운다.
-  // 엔트리에 1마리씩만 넣으면 되니 short 는 1로 고정한다.
-  const parentLines = new Map<string, PalCatchLine>();
+  // 선행(부모·조건)은 자식보다 먼저 확보해야 하므로 별도 줄로 앞에 세운다.
+  // 부모는 배합기 자리만큼, 조건 팰은 1마리만 있으면 된다.
+  const preLines = new Map<string, PalCatchLine>();
+  const addPre = (parent: PalMon, childName: string, kind: '배합 부모' | '소지 조건', count: number) => {
+    const exist = preLines.get(parent.id);
+    if (exist) {
+      exist.roles.push({ baseName: '', role: `${childName} ${kind}` });
+      exist.short = Math.max(exist.short, count);
+      return;
+    }
+    preLines.set(parent.id, {
+      pal: parent,
+      owned: owned[parent.id] ?? 0,
+      roles: [{ baseName: '', role: `${childName} ${kind}` }],
+      short: count,
+      via: 'catch',
+      missingParents: [],
+      missingConditions: [],
+      note: parent.partner ?? null,
+    });
+  };
+
   for (const line of lines) {
+    // 동종 배합이면 암수 2마리가 필요하다
     for (const parent of line.missingParents) {
-      if (parentLines.has(parent.id)) {
-        parentLines.get(parent.id)!.roles.push({ baseName: '', role: `${line.pal.name} 배합` });
-        continue;
-      }
-      parentLines.set(parent.id, {
-        pal: parent,
-        owned: owned[parent.id] ?? 0,
-        roles: [{ baseName: '', role: `${line.pal.name} 배합` }],
-        short: 1,
-        via: 'catch',
-        missingParents: [],
-        note: parent.partner ?? null,
-      });
+      addPre(parent, line.pal.name, '배합 부모', line.missingParents.length === 1 ? 2 : 1);
+    }
+    for (const cond of line.missingConditions) {
+      addPre(cond, line.pal.name, '소지 조건', 1);
     }
   }
 
-  const rest = lines.sort(
-    (a, b) => b.short - a.short || a.pal.name.localeCompare(b.pal.name)
-  );
-  return [...parentLines.values(), ...rest];
+  const rest = lines.sort((a, b) => b.short - a.short || a.pal.name.localeCompare(b.pal.name));
+  return [...preLines.values(), ...rest];
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -687,7 +702,8 @@ export function toChecklist(p: PalPlan, opts: ChecklistOptions = {}): ChecklistL
     const where = c.roles[0];
     const detail = where ? `${where.baseName} ${where.role}`.trim() : '거점 배치';
     // 부모가 아직 없으면 자식을 몇 마리 잡으라고 하면 안 된다 — 배합이 먼저다
-    const verb = c.via === 'breed' ? (c.missingParents.length > 0 ? '배합 준비' : '배합') : '포획';
+    const blocked = c.missingParents.length + c.missingConditions.length > 0;
+    const verb = c.via === 'breed' ? (blocked ? '배합 준비' : '배합') : '포획';
     lines.push({
       ref: `pal:${c.pal.id}`,
       label: `${c.pal.name} ${c.short}마리 ${verb} — ${detail}${c.pal.nocturnal ? ' (야행성)' : ''}`,

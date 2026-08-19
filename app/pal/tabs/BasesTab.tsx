@@ -194,10 +194,15 @@ export default function BasesTab({ data, roster, plan, built, owned, onBuild, on
                     </small>
                     {c.missingParents.length > 0 && (
                       <small className="task__blocked">
-                        먼저 {c.missingParents.map((p) => p.name).join(' · ')} 확보
-                        {c.note ? ` — ${c.note}` : ''}
+                        배합 부모: {c.missingParents.map((p) => p.name).join(' · ')} 필요
                       </small>
                     )}
+                    {c.missingConditions.length > 0 && (
+                      <small className="task__blocked">
+                        소지 조건: {c.missingConditions.map((p) => p.name).join(' · ')} 풀농축 필요
+                      </small>
+                    )}
+                    {c.note && <small className="muted">{c.note}</small>}
                     {(pal?.partner || pal?.source) && (
                       <small className="muted">
                         {[pal.source, pal.partner].filter(Boolean).join(' · ')}
