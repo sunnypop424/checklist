@@ -52,7 +52,74 @@ returns void language sql security definer set search_path = public as $$
    where i.id = x.id and i.list_id = p_list_id;
 $$;
 
-revoke execute on function public.reorder_items(text, uuid[]) from anon, authenticated;
+-- ⚠ 함수는 생성 시 PUBLIC 에 EXECUTE 가 자동으로 붙는다. anon/authenticated 만
+--   revoke 하면 PUBLIC 을 통해 그대로 상속되어 아무 효과가 없다 (proacl 의 '=X/postgres').
+--   security definer 함수라 뚫리면 anon 이 남의 리스트 순서를 바꿀 수 있다.
+revoke all on function public.reorder_items(text, uuid[]) from public, anon, authenticated;
+grant execute on function public.reorder_items(text, uuid[]) to service_role;
+
+-- ============================================================
+-- 팰월드 트래커 연동 (docs/팰월드_트래커_기획서.md 2장)
+-- 트래커는 별도 오버레이를 갖지 않는다. 계산 결과를 여기 lists/items 로
+-- 밀어넣으면 기존 /o/[id] 가 /o/pal 로 그대로 렌더한다.
+-- ============================================================
+
+-- 이 목록을 사람이 만들었는가(manual), 트래커가 만들었는가(pal)
+alter table public.lists add column if not exists source text not null default 'manual';
+
+-- 트래커가 생성한 항목의 안정적인 식별자 ('farm:hunt_fire' 등).
+-- uuid 는 sync 때마다 바뀌면 안 되므로 ref 로 매칭한다.
+-- 손으로 만든 항목은 ref = null 이고 여러 개 존재할 수 있어 부분 인덱스를 쓴다.
+alter table public.items add column if not exists ref text;
+create unique index if not exists items_list_ref_idx
+  on public.items (list_id, ref) where ref is not null;
+
+-- ---------- 트래커 → 체크리스트 sync ----------
+-- p_items = [{ref, label, done, position}, ...]
+--
+-- ⚠ 전체 삭제 후 재삽입으로 바꾸지 말 것. Realtime 이 삭제 이벤트를 먼저
+--    흘려보내서 방송 중 오버레이가 한 번 빈 화면으로 깜빡인다. 반드시 diff.
+create or replace function public.pal_sync_list(p_items jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  -- title 은 덮어쓰지 않는다 — /control 에서 이름을 바꿔 쓸 수 있어야 한다
+  insert into public.lists (id, title, source)
+       values ('pal', '팰월드 4거점', 'pal')
+  on conflict (id) do update set source = 'pal';
+
+  -- 이번 목록에 없는 항목 제거.
+  -- ref is null 도 지운다 — 이 목록에 손으로 넣은 항목은 다음 sync 때 어차피 유실되므로
+  -- 남겨두면 "지워지지 않는 유령 항목"이 된다.
+  delete from public.items i
+   where i.list_id = 'pal'
+     and (
+       i.ref is null
+       or not exists (
+         select 1
+           from jsonb_array_elements(coalesce(p_items, '[]'::jsonb)) x
+          where x->>'ref' = i.ref
+       )
+     );
+
+  -- 있는 건 갱신, 없는 건 삽입
+  insert into public.items (list_id, ref, label, done, position)
+  select 'pal',
+         x->>'ref',
+         x->>'label',
+         coalesce((x->>'done')::boolean, false),
+         coalesce((x->>'position')::int, (ord - 1)::int)
+    from jsonb_array_elements(coalesce(p_items, '[]'::jsonb)) with ordinality as t(x, ord)
+   where x->>'ref' is not null
+  on conflict (list_id, ref) where ref is not null
+  do update set label    = excluded.label,
+                done     = excluded.done,
+                position = excluded.position;
+end;
+$$;
+
+-- PUBLIC 부터 회수해야 한다 (위 reorder_items 주석 참고)
+revoke all on function public.pal_sync_list(jsonb) from public, anon, authenticated;
+grant execute on function public.pal_sync_list(jsonb) to service_role;
 
 -- ============================================================
 -- RLS: anon 은 읽기만. 쓰기는 전부 서버(service_role)를 거친다.

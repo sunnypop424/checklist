@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { adminClient } from '@/lib/supabase';
 import { requireKey } from '@/lib/auth';
 import type { MutateAction } from '@/lib/types';
@@ -25,6 +26,37 @@ function clean(text: string, max: number): string {
     .slice(0, max);
 }
 
+/**
+ * 팰월드 트래커가 관리하는 목록(source='pal')은 내용을 손으로 못 고치게 막는다.
+ * 다음 sync 때 어차피 덮어써지므로 조용히 사라지는 것보다 거절이 낫다.
+ * 목록 이름 변경·삭제·정렬은 허용한다 (trade-off: 삭제하면 다음 sync 가 다시 만든다).
+ */
+const PAL_GUARDED: ReadonlySet<MutateAction['action']> = new Set([
+  'reset_list',
+  'add_item',
+  'update_item',
+  'delete_item',
+  'reorder_items',
+]);
+
+/** action 이 건드리는 목록의 source 를 찾는다. 항목 단위 action 은 list_id 를 먼저 역추적한다. */
+async function listSourceOf(db: SupabaseClient, body: MutateAction): Promise<string | null> {
+  let listId = 'listId' in body ? body.listId : undefined;
+
+  if (!listId && 'itemId' in body) {
+    const { data } = await db
+      .from('items')
+      .select('list_id')
+      .eq('id', body.itemId)
+      .maybeSingle();
+    listId = data?.list_id as string | undefined;
+  }
+  if (!listId) return null;
+
+  const { data } = await db.from('lists').select('source').eq('id', listId).maybeSingle();
+  return (data?.source as string | undefined) ?? null;
+}
+
 export async function POST(req: Request) {
   if (!requireKey(req)) {
     return bad('인증 실패', 401);
@@ -38,6 +70,10 @@ export async function POST(req: Request) {
   }
 
   const db = adminClient();
+
+  if (PAL_GUARDED.has(body.action) && (await listSourceOf(db, body)) === 'pal') {
+    return bad('팰월드 트래커가 관리하는 목록입니다. /pal 에서 수정하세요.');
+  }
 
   try {
     switch (body.action) {

@@ -164,6 +164,44 @@
   font-weight: 700;
 }
 
+/* ---------- 팰월드 트래커가 관리하는 목록 ---------- */
+
+.pill__bot {
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.managed {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-base);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-cool);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.managed:hover {
+  background: var(--hover);
+  color: var(--text-cool-strong);
+}
+
+/* 읽기 전용 항목 — 편집 가능한 것처럼 보이는 커서를 없앤다 */
+.erow__label--static {
+  cursor: default;
+}
+.erow__check:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.add__hint--managed a {
+  color: var(--brand);
+}
+
 /* 체크리스트 목록 아래로 내린 보조 버튼들 */
 .editor__actions {
   display: flex;

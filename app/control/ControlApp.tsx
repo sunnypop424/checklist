@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { publicClient } from '@/lib/supabase';
-import type { Item, List, MutateAction } from '@/lib/types';
+import { isPalList, type Item, type List, type MutateAction } from '@/lib/types';
 import ChecklistPanel from '@/components/ChecklistPanel';
 import OverlayOptionsPanel from './OverlayOptions';
 import {
@@ -324,6 +324,10 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     );
   }, [activeId, options, showToast]);
 
+  const activeList = lists.find((l) => l.id === activeId) ?? null;
+  /** 팰월드 트래커가 채우는 목록 — 여기서는 읽기 전용이다 (다음 sync 가 덮어쓴다) */
+  const readOnly = isPalList(activeList);
+
   // ── 숫자키 1~9 로 N번째 항목 토글 / Esc 로 모달 닫기 ───────
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -333,6 +337,8 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
       }
       // 모달이 떠 있는 동안은 뒤쪽 체크리스트가 반응하면 안 된다
       if (helpOpen) return;
+      // 트래커 목록은 완료 여부가 재고에서 나온다 — 손으로 토글하면 안 된다
+      if (readOnly) return;
       const el = e.target as HTMLElement | null;
       if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -346,9 +352,8 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [helpOpen, items, toggle]);
+  }, [helpOpen, items, readOnly, toggle]);
 
-  const activeList = lists.find((l) => l.id === activeId) ?? null;
   const doneCount = items.filter((i) => i.done).length;
   // 미리보기 칼럼 폭에 맞춘 축소 비율 (소스가 더 크면 줄여서 보여준다)
   const fit = Math.min(1, previewWidth / options.width);
@@ -374,6 +379,11 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               data-active={l.id === activeId ? 'true' : 'false'}
               onClick={() => setActiveId(l.id)}
             >
+              {isPalList(l) && (
+                <span className="pill__bot" aria-hidden="true">
+                  🤖
+                </span>
+              )}
               {l.title}
             </button>
           ))}
@@ -411,6 +421,11 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               </button>
             )}
 
+            {readOnly && (
+              <a className="managed" href="/pal">
+                🤖 트래커가 관리 — /pal 에서 수정
+              </a>
+            )}
           </section>
 
           <div className="control__body" data-aside={showOptions || showPreview ? 'true' : 'false'}>
@@ -423,16 +438,19 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
                       className="erow__check"
                       onClick={() => toggle(item)}
                       aria-pressed={item.done}
-                      title={`${index + 1}번 키로도 토글`}
+                      disabled={readOnly}
+                      title={readOnly ? '재고에 따라 자동으로 결정됩니다' : `${index + 1}번 키로도 토글`}
                     >
                       <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M4.5 12.5l5 5 10-11" />
                       </svg>
                     </button>
 
-                    <span className="erow__num">{index < 9 ? index + 1 : ''}</span>
+                    <span className="erow__num">{readOnly || index >= 9 ? '' : index + 1}</span>
 
-                    {editingId === item.id ? (
+                    {readOnly ? (
+                      <span className="erow__label erow__label--static">{item.label}</span>
+                    ) : editingId === item.id ? (
                       <input
                         className="erow__input"
                         defaultValue={item.label}
@@ -449,62 +467,76 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
                       </button>
                     )}
 
-                    <div className="erow__tools">
-                      <button
-                        className="icon icon--danger"
-                        onClick={() => remove(item)}
-                        title="삭제"
-                      >
-                        ×
-                      </button>
-                    </div>
+                    {!readOnly && (
+                      <div className="erow__tools">
+                        <button
+                          className="icon icon--danger"
+                          onClick={() => remove(item)}
+                          title="삭제"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
 
-              <form
-                className="add"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const input = addInputRef.current;
-                  if (!input) return;
-                  const value = input.value;
-                  input.value = '';
-                  input.focus(); // 마우스 없이 연속 입력
-                  void addItem(value);
-                }}
-              >
-                <input
-                  ref={addInputRef}
-                  className="add__input"
-                  placeholder="항목 입력 후 Enter"
-                  onPaste={(e) => {
-                    const text = e.clipboardData.getData('text');
-                    const lines = text
-                      .split(/\r?\n/)
-                      .map((s) => s.trim())
-                      .filter(Boolean);
-                    if (lines.length > 1) {
+              {readOnly ? (
+                <p className="add__hint add__hint--managed">
+                  이 목록은 팰월드 트래커가 채웁니다. 항목 추가·수정·체크는{' '}
+                  <a href="/pal">/pal</a> 에서 재고를 입력하면 자동으로 반영됩니다.
+                </p>
+              ) : (
+                <>
+                  <form
+                    className="add"
+                    onSubmit={(e) => {
                       e.preventDefault();
-                      void (async () => {
-                        for (const line of lines) await addItem(line);
-                      })();
-                    }
-                  }}
-                />
-                <button type="submit" className="btn btn--brand">
-                  추가
-                </button>
-              </form>
-              <p className="add__hint">
-                여러 줄을 붙여넣으면 한 번에 등록됩니다. 숫자키 <kbd>1</kbd>~<kbd>9</kbd> 로 토글.
-              </p>
+                      const input = addInputRef.current;
+                      if (!input) return;
+                      const value = input.value;
+                      input.value = '';
+                      input.focus(); // 마우스 없이 연속 입력
+                      void addItem(value);
+                    }}
+                  >
+                    <input
+                      ref={addInputRef}
+                      className="add__input"
+                      placeholder="항목 입력 후 Enter"
+                      onPaste={(e) => {
+                        const text = e.clipboardData.getData('text');
+                        const lines = text
+                          .split(/\r?\n/)
+                          .map((s) => s.trim())
+                          .filter(Boolean);
+                        if (lines.length > 1) {
+                          e.preventDefault();
+                          void (async () => {
+                            for (const line of lines) await addItem(line);
+                          })();
+                        }
+                      }}
+                    />
+                    <button type="submit" className="btn btn--brand">
+                      추가
+                    </button>
+                  </form>
+                  <p className="add__hint">
+                    여러 줄을 붙여넣으면 한 번에 등록됩니다. 숫자키 <kbd>1</kbd>~<kbd>9</kbd> 로
+                    토글.
+                  </p>
+                </>
+              )}
 
               {/* 방송 중 자주 쓰는 건 체크 토글뿐이라, 나머지 버튼은 목록 아래로 내렸다 */}
               <div className="editor__actions">
-                <button className="btn" onClick={resetAll} disabled={doneCount === 0}>
-                  전체 해제
-                </button>
+                {!readOnly && (
+                  <button className="btn" onClick={resetAll} disabled={doneCount === 0}>
+                    전체 해제
+                  </button>
+                )}
                 <button className="btn" onClick={copyOverlayUrl}>
                   {copied ? '복사됨 ✓' : 'OBS URL 복사'}
                 </button>
