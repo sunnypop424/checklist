@@ -218,6 +218,15 @@ on conflict (id) do update set
   name = excluded.name, base_id = excluded.base_id, count = excluded.count,
   unlock_score = excluded.unlock_score, build_order = excluded.build_order, note = excluded.note;
 
+-- ---------- 가동 조건 (설계도 2·5~8장) ----------
+--
+-- 시설은 "지었다" 로 끝나지 않는다. 세 가지가 다 있어야 실제로 돌아간다:
+--   1. 재료  2. 요구 적성을 가진 팰  3. 전력
+-- 물질 생성기를 지어도 채굴 6 팰이 없으면 광석은 한 개도 안 나온다.
+-- 그래서 파밍 해금 판정은 "건설 완료" 가 아니라 "가동 가능" 이어야 한다.
+--
+-- power > 0 = 전력이 필요한 시설 (그 거점의 발전기가 돌아야 한다)
+
 -- 고압형 원유 추출기 → 일반형으로 교체했다.
 -- insert 는 on conflict do update 라 옛 행을 지우지 않는다. 남겨두면 계산에 계속 잡힌다.
 delete from public.pal_structures where id = 'oil_extractor_hp_b4';
@@ -266,7 +275,7 @@ insert into public.pal_farm_sources (id, name, method, place, sort, note, requir
   ('hunt_water',  '물 팰 사냥',        'manual', null, 80, null, null),
   ('hunt_ice',    '얼음 팰 사냥',      'manual', null, 90, null, null),
   ('butcher',     '팰 해체',           'manual', null,100, null, null),
-  ('worldtree',   '세계수 원정',       'manual', '세계수',110, '성수는 1.0.3 에서 필드 보스 20~30개 확정 드롭. 보스 100회면 채워진다. 고대 문명의 코어도 여기서 나온다.', null),
+  ('worldtree',   '세계수',            'manual', '세계수 지역',110, '팰키사이트 광석은 세계수에서 직접 캔다. 성수는 1.0.3 에서 필드 보스 20~30개 확정 드롭. 고대 문명의 코어도 여기서 나온다.', null),
   ('relic',       '유물·던전',         'manual', null,120, null, null)
 on conflict (id) do update set
   name = excluded.name, method = excluded.method, place = excluded.place,
@@ -299,10 +308,10 @@ insert into public.pal_items (id, name, category, source_id, sort, note) values
   ('ice_organ',      '빙결 기관',        'organ', 'hunt_ice',  200, '얼음 속성 팰'),
   ('bone',           '뼈',               'organ', 'butcher',   210, null),
   ('leather',        '가죽',             'organ', 'butcher',   220, null),
-  ('palkicite_ore',  '팰키사이트 광석',  'ore',   'worldtree', 230, '세계수에서만 나온다. 최대 병목.'),
+  ('palkicite_ore',  '팰키사이트 광석',  'ore',   'worldtree', 230, '세계수에서 직접 캔다. 최대 병목.'),
   ('sacred_water',   '세계수의 성수',    'misc',  'worldtree', 240, null),
   ('mystic_wood',    '신비한 목재',      'wood',  'worldtree', 250, null),
-  ('ancient_core',   '고대 문명의 코어', 'relic', 'worldtree', 260, '원정·세계수에서 파밍한다'),
+  ('ancient_core',   '고대 문명의 코어', 'relic', 'worldtree', 260, '세계수·원정에서 얻는다'),
   ('ancient_part',   '고대 문명의 부품', 'relic', 'relic',     270, null)
 on conflict (id) do update set
   name = excluded.name, category = excluded.category,
@@ -595,6 +604,34 @@ insert into public.pal_assignments (base_id, role, count, pal_ids, sort, note) v
   (4, '교대 예비',                  5, '{}', 60, '배합 대기 개체');
 
 -- ---------- 재고 행 확보 (모든 아이템에 0 행을 만들어 둔다) ----------
+
+-- 요구 적성: [{"work":"mining","lv":6}, ...]
+update public.pal_structures set req_aptitude = v.req::jsonb, power = v.pw
+  from (values
+    -- 광물 12종을 뽑는 핵심 시설. 채굴 팰이 없으면 아무것도 안 나온다.
+    ('matter_generator_b2', '[{"work":"mining","lv":6}]', 1),
+    -- 주괴 라인. 불로 녹이고 얼음으로 식힌다 — 둘 다 있어야 돈다.
+    ('furnace_b1',          '[{"work":"kindling","lv":6},{"work":"cooling","lv":6}]', 1),
+    -- 발전기 자체는 발전 팰이 돌린다. 이게 없으면 거점 전체가 멈춘다.
+    ('powerplant_b1',       '[{"work":"generating","lv":6}]', 0),
+    ('powerplant_b2',       '[{"work":"generating","lv":6}]', 0),
+    ('powerplant_b3',       '[{"work":"generating","lv":6}]', 0),
+    ('powerplant_b4',       '[{"work":"generating","lv":6}]', 0),
+    ('workbench_b1',        '[{"work":"handiwork","lv":6},{"work":"medicine","lv":6}]', 1),
+    ('factory_b1',          '[{"work":"handiwork","lv":6}]', 1),
+    ('weaponfactory_b1',    '[{"work":"handiwork","lv":6}]', 1),
+    ('plantation_b3',       '[{"work":"planting","lv":6},{"work":"watering","lv":6}]', 1),
+    ('kitchen_b3',          '[{"work":"kindling","lv":6}]', 1),
+    ('bigkitchen_b1',       '[{"work":"kindling","lv":6}]', 1),
+    ('bigkitchen_b2',       '[{"work":"kindling","lv":6}]', 1),
+    ('bigkitchen_b4',       '[{"work":"kindling","lv":6}]', 1),
+    ('ranch_b3',            '[{"work":"ranch","lv":1}]', 0),
+    ('mill_b3',             '[{"work":"handiwork","lv":1}]', 0),
+    -- 유정 위에 지으면 팰은 필요 없고 전력만 먹는다
+    ('oil_extractor_b4',    '[]', 1),
+    ('breeding_b4',         '[]', 1)
+  ) as v(id, req, pw)
+ where public.pal_structures.id = v.id;
 
 insert into public.pal_inventory (item_id, qty)
 select id, 0 from public.pal_items

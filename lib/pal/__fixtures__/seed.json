@@ -102,12 +102,12 @@
     },
     {
       "id": "worldtree",
-      "name": "세계수 원정",
+      "name": "세계수",
       "method": "manual",
-      "place": "세계수",
+      "place": "세계수 지역",
       "icon": "🌳",
       "sort": 110,
-      "note": "성수는 1.0.3 에서 필드 보스 20~30개 확정 드롭. 보스 100회면 채워진다. 고대 문명의 코어도 여기서 나온다.",
+      "note": "팰키사이트 광석은 세계수에서 직접 캔다. 성수는 1.0.3 에서 필드 보스 20~30개 확정 드롭. 고대 문명의 코어도 여기서 나온다.",
       "requires_structure": null
     },
     {
@@ -304,7 +304,7 @@
       "category": "ore",
       "source_id": "worldtree",
       "sort": 230,
-      "note": "세계수에서만 나온다. 최대 병목."
+      "note": "세계수에서 직접 캔다. 최대 병목."
     },
     {
       "id": "sacred_water",
@@ -328,7 +328,7 @@
       "category": "relic",
       "source_id": "worldtree",
       "sort": 260,
-      "note": "원정·세계수에서 파밍한다"
+      "note": "세계수·원정에서 얻는다"
     },
     {
       "id": "ancient_part",
@@ -1009,8 +1009,13 @@
       "name": "대형 부엌",
       "base_id": 1,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "kindling"
+        }
+      ],
       "unlock_score": 3,
       "build_order": 5,
       "note": null
@@ -1020,8 +1025,13 @@
       "name": "대형 부엌",
       "base_id": 2,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "kindling"
+        }
+      ],
       "unlock_score": 3,
       "build_order": 5,
       "note": null
@@ -1031,8 +1041,13 @@
       "name": "대형 부엌",
       "base_id": 4,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "kindling"
+        }
+      ],
       "unlock_score": 3,
       "build_order": 5,
       "note": null
@@ -1042,8 +1057,8 @@
       "name": "고대 문명 배합기",
       "base_id": 4,
       "count": 3,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [],
       "unlock_score": 4,
       "build_order": 4,
       "note": "기술 76, 슬롯 10. AI 코어 150개가 여기 들어간다."
@@ -1185,8 +1200,13 @@
       "name": "고도 문명 작업 공장",
       "base_id": 1,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "handiwork"
+        }
+      ],
       "unlock_score": 6,
       "build_order": 3,
       "note": "컴퓨터·AI 코어 제작. 수작업 4마리"
@@ -1240,8 +1260,17 @@
       "name": "고대 문명 화로",
       "base_id": 1,
       "count": 2,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "kindling"
+        },
+        {
+          "lv": 6,
+          "work": "cooling"
+        }
+      ],
       "unlock_score": 10,
       "build_order": 1,
       "note": "팰키사이트·솔라이트 주괴 라인. 여기부터 모든 게 시작된다."
@@ -1361,8 +1390,13 @@
       "name": "고대 문명 부엌",
       "base_id": 3,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "kindling"
+        }
+      ],
       "unlock_score": 2,
       "build_order": 5,
       "note": "기술 70. 상시 가동이 아니라 1대면 충분"
@@ -1372,8 +1406,13 @@
       "name": "고대 문명 물질 생성기",
       "base_id": 2,
       "count": 5,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "mining"
+        }
+      ],
       "unlock_score": 9,
       "build_order": 2,
       "note": "기술 78. 광물 12종 자동화. 1대만 지어도 파밍이 통째로 풀린다."
@@ -1383,8 +1422,13 @@
       "name": "제분기",
       "base_id": 3,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 1,
+          "work": "handiwork"
+        }
+      ],
       "unlock_score": 1,
       "build_order": 5,
       "note": null
@@ -1394,11 +1438,11 @@
       "name": "원유 추출기",
       "base_id": 4,
       "count": 4,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [],
       "unlock_score": 7,
       "build_order": 4,
-      "note": "일반형. 유전 위에 지어서 고압형보다 훨씬 싸다 (팰 금속 125 / 전자기판 25, 전력 2000)."
+      "note": "기술 50 해제. 지상 원유 매장지(유정) 위에만 설치 가능. 팰 금속 주괴 125 + 전자기판 25."
     },
     {
       "id": "palbox_b1",
@@ -1449,8 +1493,17 @@
       "name": "고대 문명 재배기",
       "base_id": 3,
       "count": 4,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "planting"
+        },
+        {
+          "lv": 6,
+          "work": "watering"
+        }
+      ],
       "unlock_score": 3,
       "build_order": 5,
       "note": "기술 78"
@@ -1460,8 +1513,13 @@
       "name": "고대 문명 발전기",
       "base_id": 1,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "generating"
+        }
+      ],
       "unlock_score": 8,
       "build_order": 1,
       "note": null
@@ -1471,8 +1529,13 @@
       "name": "고대 문명 발전기",
       "base_id": 2,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "generating"
+        }
+      ],
       "unlock_score": 8,
       "build_order": 2,
       "note": null
@@ -1482,8 +1545,13 @@
       "name": "고대 문명 발전기",
       "base_id": 3,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "generating"
+        }
+      ],
       "unlock_score": 8,
       "build_order": 5,
       "note": null
@@ -1493,8 +1561,13 @@
       "name": "고대 문명 발전기",
       "base_id": 4,
       "count": 2,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "generating"
+        }
+      ],
       "unlock_score": 8,
       "build_order": 4,
       "note": null
@@ -1504,8 +1577,13 @@
       "name": "가축 목장",
       "base_id": 3,
       "count": 4,
-      "power": null,
-      "req_aptitude": null,
+      "power": 0,
+      "req_aptitude": [
+        {
+          "lv": 1,
+          "work": "ranch"
+        }
+      ],
       "unlock_score": 2,
       "build_order": 5,
       "note": "양털 자동 생산"
@@ -1559,8 +1637,13 @@
       "name": "고도 문명 무기 공장",
       "base_id": 1,
       "count": 1,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "handiwork"
+        }
+      ],
       "unlock_score": 2,
       "build_order": 3,
       "note": "무기·탄약 대량 생산. 수작업 4마리"
@@ -1570,8 +1653,17 @@
       "name": "고대 문명 작업대",
       "base_id": 1,
       "count": 2,
-      "power": null,
-      "req_aptitude": null,
+      "power": 1,
+      "req_aptitude": [
+        {
+          "lv": 6,
+          "work": "handiwork"
+        },
+        {
+          "lv": 6,
+          "work": "medicine"
+        }
+      ],
       "unlock_score": 5,
       "build_order": 3,
       "note": "팰키사이트 티어 장비 전용. 수작업6 1 + 제약6 1"

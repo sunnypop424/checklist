@@ -23,6 +23,8 @@ import type {
   PalItem,
   PalNeed,
   PalPlan,
+  ProductionLine,
+  AptitudeNeed,
   PalRoster,
   OwnedPals,
   PalMon,
@@ -182,9 +184,15 @@ export function blockScores(
 // 파밍 작업
 // ─────────────────────────────────────────────────────────────
 
-/** 자동 획득처가 요구하는 시설이 1대라도 지어졌는가 */
-function sourceUnlocked(src: FarmSource, built: BuiltMap): boolean {
+/**
+ * 자동 획득처가 실제로 생산 중인가.
+ *
+ * "지었다" 가 아니라 "돌아간다" 가 기준이다 — 시설만 세워두고 팰을 안 넣으면
+ * 재료는 한 개도 안 늘어난다. operational 집합을 밖에서 넘겨받는다.
+ */
+function sourceUnlocked(src: FarmSource, built: BuiltMap, operational?: Set<string>): boolean {
   if (src.method !== 'auto' || !src.requires_structure) return true;
+  if (operational) return operational.has(src.requires_structure);
   return (built[src.requires_structure] ?? 0) >= 1;
 }
 
@@ -205,7 +213,8 @@ export function farmTasks(
   recipes: RecipeMap,
   stock: Inventory,
   built: BuiltMap,
-  shortage?: ExpandOut
+  shortage?: ExpandOut,
+  operational?: Set<string>
 ): FarmTask[] {
   const short = shortage ?? totalShortage(data, recipes, stock, built);
   const blocked = blockScores(data, recipes, stock, built);
@@ -250,7 +259,7 @@ export function farmTasks(
     // 총합 비율로 재면 금속 광석 하나가 획득처 전체를 대표해버린다
     const progress = lines.reduce((sum, l) => sum + l.progress, 0) / lines.length;
 
-    const unlocked = sourceUnlocked(source, built);
+    const unlocked = sourceUnlocked(source, built, operational);
     const lockedBy = unlocked ? null : (structures[source.requires_structure ?? ''] ?? null);
 
     // 합이 아니라 최댓값. 품목이 많다는 이유로 점수가 오르면 안 된다.
@@ -390,6 +399,147 @@ export function buildTasks(
 
   tasks.sort((a, b) => b.score - a.score);
   return tasks;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 생산 라인 — 시설 + 팰 + 전력
+// ─────────────────────────────────────────────────────────────
+
+/** 적성 코드 → 한국어 (설계도 9장 표기) */
+export const WORK_LABELS: Record<string, string> = {
+  kindling: '불 피우기',
+  cooling: '냉각',
+  handiwork: '수작업',
+  medicine: '제약',
+  mining: '채굴',
+  planting: '파종',
+  watering: '관개',
+  gathering: '채집',
+  generating: '발전',
+  lumbering: '벌목',
+  transport: '운반',
+  ranch: '목장',
+};
+
+/** 이 적성을 lv 이상으로 가진 보유 팰 마릿수 */
+function countAble(pals: PalMon[], owned: OwnedPals, work: string, lv: number): number {
+  return pals
+    .filter((p) => (p.aptitudes?.[work] ?? 0) >= lv)
+    .reduce((sum, p) => sum + (owned[p.id] ?? 0), 0);
+}
+
+/** 이 적성을 만족하는 추천 팰 (아직 없을 때 뭘 잡을지) */
+function ableCandidates(pals: PalMon[], work: string, lv: number): PalMon[] {
+  return pals
+    .filter((p) => (p.aptitudes?.[work] ?? 0) >= lv)
+    .sort((a, b) => (b.aptitudes[work] ?? 0) - (a.aptitudes[work] ?? 0))
+    .slice(0, 3);
+}
+
+/**
+ * 생산 라인 목록. 설계도 12장 건설 순서대로 정렬한다.
+ *
+ * "지었다" 가 아니라 "돌아간다" 를 기준으로 삼는 게 핵심이다.
+ * 물질 생성기를 지어도 채굴 6 팰이 없으면 광석은 한 개도 안 나온다.
+ */
+export function productionLines(
+  data: PalData,
+  recipes: RecipeMap,
+  stock: Inventory,
+  built: BuiltMap,
+  roster: PalRoster | undefined,
+  owned: OwnedPals
+): ProductionLine[] {
+  const pals = roster?.pals ?? [];
+  const items = byId(data.items);
+  const bases: Record<number, PalBase> = {};
+  for (const b of data.bases) bases[b.id] = b;
+  const costsByStructure = groupCosts(data);
+
+  // 거점별 발전기가 돌아가는지 — 전력을 먹는 시설의 선행이다
+  const powerOkByBase: Record<number, boolean> = {};
+  for (const s of data.structures) {
+    if (!/^powerplant_/.test(s.id) || s.base_id == null) continue;
+    const reqs = s.req_aptitude ?? [];
+    const ok =
+      (built[s.id] ?? 0) >= 1 && reqs.every((r) => countAble(pals, owned, r.work, r.lv) >= 1);
+    powerOkByBase[s.base_id] = powerOkByBase[s.base_id] || ok;
+  }
+
+  // 시설 → 그 시설이 열어주는 획득처
+  const sourceOf: Record<string, FarmSource> = {};
+  for (const src of data.sources) {
+    if (src.requires_structure) sourceOf[src.requires_structure] = src;
+  }
+
+  // 팰이나 전력을 요구하는 시설, 또는 획득처를 여는 시설만 "라인" 으로 본다.
+  // 침대·상자까지 라인으로 세면 목록이 의미를 잃는다.
+  const relevant = data.structures.filter(
+    (s) => (s.req_aptitude?.length ?? 0) > 0 || (s.power ?? 0) > 0 || sourceOf[s.id]
+  );
+
+  const lines = relevant.map((s): ProductionLine => {
+    const nBuilt = built[s.id] ?? 0;
+
+    // 1대를 더 짓는 데 부족한 재료
+    const copy: Inventory = { ...stock };
+    const out = emptyOut();
+    if (nBuilt < s.count) {
+      for (const c of costsByStructure[s.id] ?? []) expand(recipes, c.item_id, c.qty, copy, out);
+    }
+    const missingMaterials = Object.entries(out.leaf)
+      .filter(([, n]) => n > 0)
+      .map(([id, n]) => ({ id, name: items[id]?.name ?? id, short: n }))
+      .sort((a, b) => b.short - a.short);
+
+    const aptitudes: AptitudeNeed[] = (s.req_aptitude ?? []).map((r) => {
+      const have = countAble(pals, owned, r.work, r.lv);
+      return {
+        work: r.work,
+        label: WORK_LABELS[r.work] ?? r.work,
+        lv: r.lv,
+        have,
+        ok: have >= 1,
+        candidates: ableCandidates(pals, r.work, r.lv),
+      };
+    });
+
+    const needsPower = (s.power ?? 0) > 0;
+    const powerOk = !needsPower || (s.base_id != null && powerOkByBase[s.base_id] === true);
+    const palsOk = aptitudes.every((a) => a.ok);
+    const operational = nBuilt >= 1 && palsOk && powerOk;
+
+    const blocker: ProductionLine['blocker'] = operational
+      ? null
+      : nBuilt < 1
+        ? missingMaterials.length > 0
+          ? '재료'
+          : '건설'
+        : !powerOk
+          ? '전력'
+          : '팰';
+
+    return {
+      structure: s,
+      base: s.base_id != null ? (bases[s.base_id] ?? null) : null,
+      source: sourceOf[s.id] ?? null,
+      built: nBuilt,
+      missingMaterials,
+      aptitudes,
+      needsPower,
+      powerOk,
+      operational,
+      blocker,
+    };
+  });
+
+  // 설계도 12장 순서 → 같은 순서 안에서는 해금 영향이 큰 것부터
+  lines.sort(
+    (a, b) =>
+      (a.structure.build_order ?? 99) - (b.structure.build_order ?? 99) ||
+      b.structure.unlock_score - a.structure.unlock_score
+  );
+  return lines;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -643,15 +793,21 @@ export function plan(
   owned: OwnedPals = {}
 ): PalPlan {
   const recipes = buildRecipeMap(data);
+
+  // 생산 라인을 먼저 푼다 — 파밍 해금 판정이 "가동 중" 인지에 달려 있다
+  const lines = productionLines(data, recipes, stock, built, roster, owned);
+  const operational = new Set(lines.filter((l) => l.operational).map((l) => l.structure.id));
+  const currentLine = lines.find((l) => !l.operational) ?? null;
+
   const shortage = totalShortage(data, recipes, stock, built);
-  const farm = farmTasks(data, recipes, stock, built, shortage);
+  const farm = farmTasks(data, recipes, stock, built, shortage, operational);
   const build = buildTasks(data, recipes, stock, built);
   const craft = craftPlan(data, recipes, stock, shortage);
 
   // 지금 단계만 놓고 본 부족량. 할 일 탭과 오버레이는 이쪽을 쓴다.
   const { order, structures: stageStructs } = stageStructures(data, built);
   const stageShortage = shortageFor(data, recipes, stock, built, stageStructs);
-  const stageFarm = farmTasks(data, recipes, stock, built, stageShortage);
+  const stageFarm = farmTasks(data, recipes, stock, built, stageShortage, operational);
   const stageLines = stageFarm.flatMap((t) => t.items);
   const stage = {
     order,
@@ -679,9 +835,16 @@ export function plan(
 
   const bottlenecks = [...allLines].sort((a, b) => b.short - a.short).slice(0, 5);
 
+  // 사냥·원정은 시설과 무관하게 언제든 병렬로 할 수 있다.
+  // 생산 라인(시설을 갖춰가며 순서대로 여는 것)과 성격이 전혀 다르므로 따로 뽑는다.
+  const manualFarm = stageFarm.filter((t) => t.source.method === 'manual');
+
   return {
     farm,
     stage,
+    lines,
+    currentLine,
+    manualFarm,
     build,
     craft,
     palNeeds: needs,

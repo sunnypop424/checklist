@@ -372,6 +372,69 @@
 .task__need {
   color: var(--text-cool);
 }
+
+/* ---------- 생산 라인: 재료 → 건설 → 팰 → 전력 ---------- */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 8px;
+}
+.steps li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: #ffffff08;
+  color: var(--text-cool);
+  font-size: 13px;
+  line-height: 1.45;
+}
+/* 이미 갖춰진 단계는 눈에서 빼준다 — 남은 것만 보이게 */
+.steps li[data-ok='true'] {
+  opacity: 0.55;
+}
+.steps li[data-ok='true'] .steps__label {
+  background: #00ffa31f;
+  color: var(--brand);
+}
+.steps__label {
+  flex: 0 0 auto;
+  min-width: 38px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #ffab6b22;
+  color: #ffab6b;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.steps__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.apt {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffab6b1a;
+  color: #ffab6b;
+  font-size: 12px;
+  font-weight: 700;
+}
+.apt[data-ok='true'] {
+  background: #00ffa31a;
+  color: var(--brand-strong);
+}
 .task__ready {
   color: var(--brand-strong);
 }

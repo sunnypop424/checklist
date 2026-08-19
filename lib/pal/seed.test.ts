@@ -261,14 +261,36 @@ describe('현재 시드 기준 우선순위', () => {
     expect(p.farm[0].lockedBy?.id).toBe('matter_generator_b2');
   });
 
-  it('원유 추출기는 이미 지은 것으로 보면 잠금이 풀린다', () => {
-    const p2 = plan(live, {}, { oil_extractor_b4: 4 }, crew, {});
-    const oil = p2.farm.find((t) => t.source.id === 'oil');
-    expect(oil?.lockedBy).toBeNull();
+  it('시설만 지어서는 잠금이 안 풀린다 — 전력과 팰이 있어야 한다', () => {
+    // 원유 추출기는 전력을 먹는다. 발전기가 안 돌면 원유는 한 방울도 안 나온다.
+    const onlyBuilt = plan(live, {}, { oil_extractor_b4: 4 }, crew, {});
+    expect(onlyBuilt.farm.find((t) => t.source.id === 'oil')?.lockedBy).not.toBeNull();
+
+    // 발전기를 짓고 발전 6+ 팰까지 넣으면 그제서야 돈다
+    const running = plan(
+      live,
+      {},
+      { oil_extractor_b4: 4, powerplant_b4: 1 },
+      crew,
+      { shogunbokchi: 1 }
+    );
+    expect(running.farm.find((t) => t.source.id === 'oil')?.lockedBy).toBeNull();
   });
 
-  it('자동 시설을 지으면 수동 파밍이 자동보다 앞선다 (설계도 16-5)', () => {
-    const p2 = plan(live, {}, { matter_generator_b2: 1, oil_extractor_b4: 4, ranch_b3: 1 }, crew, {});
+  it('자동 라인이 전부 돌면 수동 파밍이 자동보다 앞선다 (설계도 16-5)', () => {
+    const p2 = plan(
+      live,
+      {},
+      {
+        matter_generator_b2: 1,
+        powerplant_b2: 1,
+        oil_extractor_b4: 4,
+        powerplant_b4: 1,
+        ranch_b3: 1,
+      },
+      crew,
+      { shellgadra: 1, shogunbokchi: 1, milcow: 1 }
+    );
     expect(p2.farm[0].source.method).toBe('manual');
 
     const firstAuto = p2.farm.findIndex((t) => t.source.method === 'auto');
@@ -325,5 +347,69 @@ describe('단계 — 지금 할 수 있는 크기로 자른다', () => {
     const one = gen.missing.find((m) => m.id === 'palkicite_ore')!.short;
     const all = gen.missingAll.find((m) => m.id === 'palkicite_ore')!.short;
     expect(all).toBe(one * 5);
+  });
+});
+
+describe('생산 라인 — 시설 + 팰 + 전력', () => {
+  it('아무것도 없으면 첫 라인의 병목은 재료다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    expect(p.currentLine).not.toBeNull();
+    expect(p.currentLine!.blocker).toBe('재료');
+  });
+
+  it('물질 생성기는 채굴 6 팰을 요구한다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const gen = p.lines.find((l) => l.structure.id === 'matter_generator_b2')!;
+    expect(gen.aptitudes.map((a) => `${a.label} ${a.lv}`)).toEqual(['채굴 6']);
+    expect(gen.aptitudes[0].ok).toBe(false);
+    // 뭘 잡아야 하는지도 알려준다
+    expect(gen.aptitudes[0].candidates.map((c) => c.id)).toContain('shellgadra');
+  });
+
+  it('화로는 불 피우기와 냉각을 둘 다 요구한다 (주괴 라인)', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const furnace = p.lines.find((l) => l.structure.id === 'furnace_b1')!;
+    expect(furnace.aptitudes.map((a) => a.work).sort()).toEqual(['cooling', 'kindling']);
+  });
+
+  it('지었지만 팰이 없으면 병목은 팰이다', () => {
+    const p = plan(live, {}, { matter_generator_b2: 1, powerplant_b2: 1 }, crew, {
+      shogunbokchi: 1,
+    });
+    const gen = p.lines.find((l) => l.structure.id === 'matter_generator_b2')!;
+    expect(gen.blocker).toBe('팰');
+    expect(gen.operational).toBe(false);
+  });
+
+  it('지었고 팰도 있지만 전력이 없으면 병목은 전력이다', () => {
+    const p = plan(live, {}, { matter_generator_b2: 1 }, crew, { shellgadra: 1 });
+    const gen = p.lines.find((l) => l.structure.id === 'matter_generator_b2')!;
+    expect(gen.needsPower).toBe(true);
+    expect(gen.powerOk).toBe(false);
+    expect(gen.blocker).toBe('전력');
+  });
+
+  it('셋이 다 갖춰지면 라인이 돌고 파밍이 풀린다', () => {
+    const p = plan(live, {}, { matter_generator_b2: 1, powerplant_b2: 1 }, crew, {
+      shellgadra: 1,
+      shogunbokchi: 1,
+    });
+    const gen = p.lines.find((l) => l.structure.id === 'matter_generator_b2')!;
+    expect(gen.operational).toBe(true);
+    expect(gen.blocker).toBeNull();
+    expect(p.farm.find((t) => t.source.id === 'generator')?.lockedBy).toBeNull();
+  });
+
+  it('사냥·원정은 시설과 무관하게 언제든 병렬로 할 수 있다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    expect(p.manualFarm.length).toBeGreaterThan(0);
+    expect(p.manualFarm.every((t) => t.source.method === 'manual')).toBe(true);
+    expect(p.manualFarm.every((t) => t.lockedBy === null)).toBe(true);
+  });
+
+  it('라인은 설계도 12장 건설 순서를 따른다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const orders = p.lines.map((l) => l.structure.build_order ?? 99);
+    expect(orders).toEqual([...orders].sort((a, b) => a - b));
   });
 });

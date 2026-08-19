@@ -45,6 +45,10 @@ export type Structure = {
   name: string;
   base_id: number | null;
   count: number;
+  /** 0보다 크면 전력이 필요한 시설 (그 거점의 발전기가 돌아야 한다) */
+  power: number | null;
+  /** 이 시설을 돌리는 데 필요한 적성 [{"work":"mining","lv":6}] */
+  req_aptitude: { work: string; lv: number }[] | null;
   unlock_score: number;
   build_order: number | null;
   note: string | null;
@@ -221,6 +225,12 @@ export type PalPlan = {
   farm: FarmTask[];
   /** 지금 단계만 (할 일 탭·오버레이가 쓰는 것) */
   stage: Stage;
+  /** 생산 라인 — 순서대로 하나씩 연다 */
+  lines: ProductionLine[];
+  /** 지금 열어야 할 라인 (아직 안 돌아가는 첫 번째) */
+  currentLine: ProductionLine | null;
+  /** 사냥·원정처럼 시설과 무관하게 언제든 할 수 있는 파밍 */
+  manualFarm: FarmTask[];
   build: BuildTask[];
   craft: CraftLine[];
   /** 거점 배치 자리별 충원 현황 */
@@ -234,6 +244,42 @@ export type PalPlan = {
   shortage: ExpandOut;
   /** 부족량이 큰 순서대로 병목 재료 */
   bottlenecks: FarmItemLine[];
+};
+
+/** 시설 하나가 요구하는 적성과 현재 보유 상황 */
+export type AptitudeNeed = {
+  work: string;
+  /** 한국어 작업 이름 */
+  label: string;
+  lv: number;
+  /** 조건을 만족하는 보유 팰 마릿수 */
+  have: number;
+  ok: boolean;
+  /** 조건을 만족하는 추천 팰 (아직 없을 때 뭘 잡을지) */
+  candidates: PalMon[];
+};
+
+/**
+ * 생산 라인 — 시설 하나와 그 시설이 열어주는 획득처.
+ *
+ * 시설은 "지었다" 로 끝나지 않는다. 재료·팰·전력 셋이 다 있어야 실제로 돈다.
+ * 물질 생성기를 지어도 채굴 6 팰이 없으면 광석은 한 개도 안 나온다.
+ */
+export type ProductionLine = {
+  structure: Structure;
+  base: PalBase | null;
+  /** 이 시설이 열어주는 획득처 (없을 수도 있다) */
+  source: FarmSource | null;
+  built: number;
+  /** 1대를 짓기 위해 부족한 재료 */
+  missingMaterials: { id: string; name: string; short: number }[];
+  aptitudes: AptitudeNeed[];
+  needsPower: boolean;
+  powerOk: boolean;
+  /** 지었고, 팰도 있고, 전력도 있다 = 실제로 생산 중 */
+  operational: boolean;
+  /** 다음에 해야 할 일 한 줄 요약 */
+  blocker: '재료' | '건설' | '팰' | '전력' | null;
 };
 
 /** 팰 도감·배치표 (게임 데이터와 분리해서 로드한다) */
