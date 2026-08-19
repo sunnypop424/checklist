@@ -1,0 +1,1019 @@
+/* ============================================================
+   팰월드 트래커 — /pal
+   토큰은 globals.css(치지직 다크)를 그대로 쓴다.
+   ⚠ 오버레이가 아니라 관리 화면이므로 배경색을 넣어도 된다.
+   ============================================================ */
+
+.pal {
+  min-height: 100vh;
+  padding: 18px 22px 60px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.pal * {
+  font-family: var(--font);
+}
+
+/* globals.css 는 html/body 만 리셋한다. 제목의 브라우저 기본 마진
+   (h2 는 0.83em ≈ 12px)이 그대로 남아 카드 안이 위로 벌어진다. */
+.pal h1,
+.pal h2,
+.pal h3,
+.pal p,
+.pal ul,
+.pal ol {
+  margin: 0;
+  padding: 0;
+}
+.pal ul,
+.pal ol {
+  list-style: none;
+}
+
+.pal--empty {
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  text-align: center;
+}
+.pal--empty code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface-base);
+  font-family: ui-monospace, monospace;
+}
+
+/* ---------- 상단 ---------- */
+
+.pal__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pal__brand {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text-cool-strong);
+}
+
+.pal__top-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pal__stat {
+  font-size: 13px;
+  color: var(--text-cool);
+}
+.pal__stat em {
+  margin-left: 4px;
+  color: var(--brand);
+  font-style: normal;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.pal__link {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-base);
+  color: var(--text-cool);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.pal__link:hover {
+  background: var(--hover);
+  color: var(--text-cool-strong);
+}
+
+/* ---------- 탭 ---------- */
+
+.pal__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ffffff14;
+  margin-bottom: 16px;
+}
+
+.pal__tab {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-base);
+  color: var(--text-cool);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+.pal__tab:hover {
+  background: var(--surface-subtle);
+}
+.pal__tab[data-active='true'] {
+  background: var(--brand);
+  color: #06281c;
+}
+
+.pal__sync {
+  margin-left: auto;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 카드 ---------- */
+
+.pal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* 각 탭의 최상위 래퍼. 여기에 gap 이 없으면 카드끼리 딱 붙는다 —
+   .pal__body 의 gap 은 "탭 내용 전체" 하나에만 걸리기 때문이다. */
+.todo,
+.inv,
+.farm,
+.craft,
+.bases,
+.datatab {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-weaker);
+  border: 1px solid #ffffff0f;
+}
+.card[data-locked='true'] {
+  border-color: #00ffa333;
+}
+
+.card > *:last-child {
+  margin-bottom: 0;
+}
+
+.card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.card__head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+.card__head--toggle {
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.card .card__sub {
+  margin: 14px 0 6px;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  font-weight: 700;
+}
+.card .card__sub:first-of-type {
+  margin-top: 2px;
+}
+
+.caret {
+  flex: none;
+  transition: transform 0.15s var(--ease);
+  color: var(--text-cool-weak);
+}
+.caret[data-open='true'] {
+  transform: rotate(90deg);
+}
+
+.pal .muted {
+  margin: 0 0 8px;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  line-height: 1.5;
+}
+/* 카드 헤더 오른쪽에 붙는 짧은 보조 텍스트에는 마진이 없어야 한다 */
+.card__head .muted,
+.task .muted,
+.brow .muted,
+.catchrow .muted,
+.prow .muted {
+  margin: 0;
+}
+.muted code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--surface-base);
+  font-family: ui-monospace, monospace;
+}
+.pal .warn {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: #ffffff08;
+  border: 1px solid #ffffff14;
+}
+.ok {
+  color: var(--brand-strong);
+}
+.mono {
+  font-family: ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 공통 바 ---------- */
+
+.bar {
+  position: relative;
+  flex: 1 1 80px;
+  min-width: 60px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-weakest);
+  overflow: hidden;
+}
+.bar--sm {
+  flex: 0 0 70px;
+  height: 5px;
+}
+.bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand);
+  transition: width 0.25s var(--ease);
+}
+
+/* ---------- 버튼 / 칩 ---------- */
+
+.btn {
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface-base);
+  color: var(--text-cool-strong);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  background: var(--surface-subtle);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.btn--sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.btn--brand {
+  background: var(--brand);
+  color: #06281c;
+}
+.btn--brand:hover:not(:disabled) {
+  background: var(--brand-stronger);
+}
+
+.qbtn {
+  min-width: 30px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-base);
+  color: var(--text-cool);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.qbtn:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  color: var(--text);
+}
+.qbtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.qbtn--minus {
+  color: var(--text-cool-weak);
+}
+
+.chip {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface-base);
+  color: var(--text-cool);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.chip--manual {
+  background: #ff8a3d22;
+  color: #ffab6b;
+}
+.chip--ok {
+  background: #00ffa322;
+  color: var(--brand);
+}
+.chip--key {
+  background: #00ffa31a;
+  color: var(--brand-strong);
+}
+.chip--lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #ffffff0f;
+  color: var(--text-cool-weak);
+}
+.chip--night {
+  background: #7a8cff22;
+  color: #9fb0ff;
+}
+.chip--breed {
+  background: #ffd16622;
+  color: #ffd166;
+}
+
+/* 선행이 안 끝나서 아직 못 하는 작업 */
+.task__blocked {
+  color: #ffab6b;
+}
+
+/* ---------- 할 일 ---------- */
+
+/* 넓은 화면에서는 오버레이 미리보기를 오른쪽에 붙여 둔다 —
+   재고를 고치면서 방송 화면이 어떻게 바뀌는지 바로 봐야 한다. */
+.todo__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: 14px;
+}
+.todo__main,
+.todo__side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.todo__side {
+  position: sticky;
+  top: 14px;
+}
+
+@media (max-width: 1080px) {
+  .todo__cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .todo__side {
+    position: static;
+  }
+}
+
+/* 미리보기는 실제 오버레이와 같은 컴포넌트를 그린다.
+   투명 배경이라 체커보드를 깔아야 글자 대비가 방송과 비슷하게 보인다. */
+.ovpreview {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: var(--radius);
+  border: 1px solid #ffffff14;
+  background-color: #1a1b1d;
+  background-image:
+    linear-gradient(45deg, #ffffff08 25%, transparent 25%, transparent 75%, #ffffff08 75%),
+    linear-gradient(45deg, #ffffff08 25%, transparent 25%, transparent 75%, #ffffff08 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  overflow: hidden;
+}
+.ovpreview .overlay-root {
+  position: static;
+  width: 100%;
+  height: auto;
+}
+
+.gauges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.gauge {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* .gauge 는 세로 flex 다. .bar 의 flex-basis 80px 이 여기서는 '높이'로 해석돼
+   게이지가 통째로 검은 블록이 된다. 반드시 고정 높이로 되돌려야 한다. */
+.gauge .bar {
+  flex: none;
+  width: 100%;
+  height: 6px;
+}
+.gauge__label {
+  color: var(--text-cool-weak);
+  font-size: 12px;
+}
+.gauge__value {
+  color: var(--brand);
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.gauge__hint {
+  color: var(--text-cool-weak);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bottleneck {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bottleneck li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+  font-size: 13px;
+}
+.bottleneck .bar {
+  flex: 1 1 auto;
+  max-width: 320px;
+}
+.bottleneck__name {
+  flex: 0 0 120px;
+  color: var(--text-cool-strong);
+}
+.bottleneck__num {
+  flex: 0 0 130px;
+  text-align: right;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.task {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-width: 0;
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+}
+.task--urgent {
+  background: #00ffa314;
+  border: 1px solid #00ffa333;
+}
+.task--ready {
+  background: #ffffff0a;
+}
+.task__icon {
+  flex: 0 0 auto;
+  font-size: 15px;
+}
+.task__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+}
+.task__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.task__body b {
+  font-weight: 700;
+}
+.task__body small {
+  color: var(--text-cool-weak);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.task__pct {
+  flex: 0 0 40px;
+  text-align: right;
+  color: var(--text-cool);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.check--inline {
+  align-items: center;
+  white-space: nowrap;
+}
+.check input {
+  margin-top: 2px;
+  accent-color: var(--brand);
+}
+.check small {
+  display: block;
+  color: var(--text-cool-weak);
+  font-size: 11px;
+}
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.field input,
+.editlist input,
+.editrow input {
+  width: 78px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #ffffff1a;
+  background: var(--surface-weakest);
+  color: var(--text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 재고 ---------- */
+
+.inv__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.inv__search {
+  flex: 1 1 200px;
+  max-width: 320px;
+  padding: 8px 11px;
+  border-radius: var(--radius);
+  border: 1px solid #ffffff1a;
+  background: var(--surface-weakest);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.invlist,
+.farmlist,
+.blist,
+.plist,
+.craftlist,
+.catchlist,
+.editlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.invrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+  font-size: 13px;
+}
+.invrow[data-done='true'] {
+  opacity: 0.45;
+}
+.invrow__name {
+  flex: 0 0 130px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-cool-strong);
+}
+.invrow__name small {
+  color: var(--text-cool-weak);
+  cursor: help;
+}
+.invrow__qty {
+  width: 96px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #ffffff1a;
+  background: var(--surface-weakest);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.invrow__quick {
+  display: flex;
+  gap: 3px;
+}
+.invrow .bar {
+  flex: 1 1 auto;
+  max-width: 240px;
+}
+.invrow__need {
+  flex: 1 1 140px;
+  text-align: right;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.invrow__need b {
+  color: #ffab6b;
+}
+
+/* ---------- 파밍 ---------- */
+
+.farm__pct {
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.lock {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: #00ffa314;
+  color: var(--text-cool-strong);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.farmrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+  padding: 6px 9px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+  font-size: 13px;
+}
+.farmrow__name {
+  flex: 0 0 130px;
+  color: var(--text-cool-strong);
+}
+.farmrow .bar {
+  flex: 1 1 auto;
+  max-width: 320px;
+}
+.farmrow__num {
+  flex: 0 0 130px;
+  text-align: right;
+  color: var(--text-cool);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.farmrow__short {
+  flex: 0 0 80px;
+  text-align: right;
+  color: #ffab6b;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 제작 ---------- */
+
+.craftrow {
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+}
+.craftrow[data-ready='true'] {
+  background: #00ffa30f;
+}
+.craftrow__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+.craftrow__count {
+  color: var(--brand);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.craftrow__inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.craftrow__inputs li {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-cool);
+}
+.craftrow__inputs li[data-short='true'] b {
+  color: #ffab6b;
+}
+.craftrow__note {
+  margin-top: 5px;
+}
+
+/* ---------- 거점 ---------- */
+
+.subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.subtab {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface-base);
+  color: var(--text-cool);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.subtab[data-active='true'] {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+/* subtabs 와 카드 사이에 낀 한 줄 설명. 래퍼 gap(14px)이 이미 위아래를
+   벌려 주므로 음수 마진으로 끌어올리면 안 된다. */
+.base__role {
+  margin: -6px 0 0;
+  line-height: 1.5;
+}
+
+.brow,
+.catchrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+}
+.brow[data-done='true'] {
+  opacity: 0.5;
+}
+.brow[data-blocked='true'] {
+  background: #ffffff08;
+}
+.brow__main,
+.catchrow__main {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.brow__name {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.brow__main small,
+.catchrow__main small {
+  flex-basis: 100%;
+  font-size: 11px;
+}
+.brow__missing {
+  color: var(--text-cool-weak);
+}
+.brow__count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brow__num {
+  min-width: 56px;
+  text-align: center;
+  color: var(--text-cool-strong);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.prow {
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  background: var(--surface-weak);
+}
+.prow[data-done='true'] {
+  opacity: 0.55;
+}
+.prow__role {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.prow__slots {
+  color: var(--text-cool);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.prow__pals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.palchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: var(--surface-base);
+  font-size: 12px;
+}
+.palchip[data-have='true'] {
+  background: #00ffa31f;
+}
+.palchip__name {
+  padding: 0 4px;
+  color: var(--text-cool-strong);
+}
+.palchip__name i {
+  font-style: normal;
+  font-size: 10px;
+}
+.palchip__have {
+  min-width: 14px;
+  text-align: center;
+  color: var(--brand);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.palchip__btn {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff12;
+  color: var(--text-cool);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.palchip__btn:hover:not(:disabled) {
+  background: #ffffff24;
+  color: var(--text);
+}
+.palchip__btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.prow__todo {
+  margin-top: 6px;
+  color: #ffab6b;
+  font-size: 12px;
+}
+
+/* ---------- 데이터 ---------- */
+
+.editlist li,
+.editrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-weak);
+  font-size: 13px;
+}
+.editrow {
+  margin-bottom: 6px;
+}
+.editlist li > span:first-child {
+  flex: 0 0 140px;
+  color: var(--text-cool-strong);
+}
+.editlist label,
+.editrow label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.editlist small,
+.editrow small {
+  color: var(--text-cool-weak);
+  font-size: 11px;
+}
+
+/* ---------- 토스트 ---------- */
+
+.pal__toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  background: var(--surface-base);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: var(--shadow-card);
+  z-index: 50;
+}
+
+/* ---------- 좁은 화면 ---------- */
+
+/* 바탕화면 바로가기는 433px 크롬 팝업으로 뜬다. 여기가 실사용 폭이다. */
+@media (max-width: 720px) {
+  .pal {
+    padding: 14px 12px 48px;
+  }
+  .invrow__name,
+  .farmrow__name,
+  .bottleneck__name {
+    flex: 0 0 100%;
+  }
+  .invrow__need,
+  .farmrow__num,
+  .farmrow__short,
+  .bottleneck__num {
+    flex: 1 1 auto;
+    text-align: right;
+  }
+  .invrow .bar,
+  .bottleneck .bar,
+  .farmrow .bar {
+    max-width: none;
+  }
+  .gauges {
+    gap: 12px;
+  }
+  .gauge {
+    flex: 1 1 100px;
+  }
+  .gauge__value {
+    font-size: 18px;
+  }
+  .task__pct {
+    flex: 1 1 auto;
+  }
+  /* 숫자 입력칸이 좁아지면 값이 잘린다 */
+  .invrow__qty {
+    width: 78px;
+  }
+}

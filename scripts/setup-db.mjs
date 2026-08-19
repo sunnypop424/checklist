@@ -37,7 +37,10 @@ SUPABASE_DB_URL=postgresql://postgres.xxxxxxxx:비밀번호@aws-0-ap-northeast-2
   process.exit(1);
 }
 
-const sql = readFileSync(resolve(root, 'supabase/schema.sql'), 'utf8');
+// schema.sql 먼저, 그다음 팰월드 트래커. 순서가 중요하다 —
+// schema-pal.sql 이 참조하는 것은 없지만, 접합부(lists.source/items.ref)가
+// 먼저 있어야 db:setup 한 번으로 전체가 일관되게 선다.
+const SCHEMA_FILES = ['supabase/schema.sql', 'supabase/schema-pal.sql'];
 
 /**
  * 비밀번호에 @ # $ % 같은 특수문자가 그대로 들어있어도 파싱되도록
@@ -82,8 +85,16 @@ const client = new pg.Client({ ...cfg, ssl: { rejectUnauthorized: false } });
 try {
   await client.connect();
   console.log('✔ Supabase 연결됨');
-  await client.query(sql);
-  console.log('✔ 스키마 적용 완료 (테이블 / RLS / Realtime)');
+
+  for (const file of SCHEMA_FILES) {
+    const path = resolve(root, file);
+    if (!existsSync(path)) {
+      console.log(`· ${file} 없음 — 건너뜀`);
+      continue;
+    }
+    await client.query(readFileSync(path, 'utf8'));
+    console.log(`✔ ${file} 적용 완료`);
+  }
 
   const { rows: pub } = await client.query(
     `select tablename from pg_publication_tables

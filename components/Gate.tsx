@@ -8,25 +8,37 @@ import { useEffect, useState } from 'react';
  *
  * invalid 일 때는 저장된 키를 반드시 지운다. 안 그러면 틀린 키가 계속 자동
  * 재진입을 일으켜 입력 폼에 영영 도달하지 못한다.
+ *
+ * 저장소 키 이름('control_key')은 /control 과 /pal 이 공유한다 —
+ * 한쪽에 들어간 브라우저는 다른 쪽도 키 입력 없이 열린다.
  */
-export default function Gate({ invalid }: { invalid?: boolean }) {
+export const KEY_STORAGE = 'control_key';
+
+type Props = {
+  title: string;
+  /** 인증 성공 시 돌아갈 경로 ('/control', '/pal') */
+  redirectTo: string;
+  invalid?: boolean;
+};
+
+export default function Gate({ title, redirectTo, invalid }: Props) {
   const [value, setValue] = useState('');
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     if (invalid) {
-      localStorage.removeItem('control_key');
-      sessionStorage.removeItem('control_key');
+      localStorage.removeItem(KEY_STORAGE);
+      sessionStorage.removeItem(KEY_STORAGE);
       setChecked(true);
       return;
     }
-    const saved = sessionStorage.getItem('control_key') || localStorage.getItem('control_key');
+    const saved = sessionStorage.getItem(KEY_STORAGE) || localStorage.getItem(KEY_STORAGE);
     if (saved) {
-      window.location.replace(`/control?key=${encodeURIComponent(saved)}`);
+      window.location.replace(`${redirectTo}?key=${encodeURIComponent(saved)}`);
       return;
     }
     setChecked(true);
-  }, [invalid]);
+  }, [invalid, redirectTo]);
 
   if (!checked) return null;
 
@@ -38,11 +50,11 @@ export default function Gate({ invalid }: { invalid?: boolean }) {
           e.preventDefault();
           const key = value.trim();
           if (!key) return;
-          localStorage.setItem('control_key', key);
-          window.location.replace(`/control?key=${encodeURIComponent(key)}`);
+          localStorage.setItem(KEY_STORAGE, key);
+          window.location.replace(`${redirectTo}?key=${encodeURIComponent(key)}`);
         }}
       >
-        <h1>체크리스트 컨트롤</h1>
+        <h1>{title}</h1>
         {invalid ? (
           <p className="gate__error">비밀 키가 올바르지 않습니다. 다시 입력해 주세요.</p>
         ) : (

@@ -1,0 +1,2476 @@
+{
+  "sources": [
+    {
+      "id": "generator",
+      "name": "물질 생성기",
+      "method": "auto",
+      "place": "거점② 자원",
+      "icon": "⛏",
+      "sort": 10,
+      "note": "생성기 5대를 품목 고정으로 나눠 돌린다. 가동 중 품목 변경은 속도가 급락한다.",
+      "requires_structure": "matter_generator_b2"
+    },
+    {
+      "id": "oil",
+      "name": "고압형 원유 추출기",
+      "method": "auto",
+      "place": "거점④ 배합·원유",
+      "icon": "🛢",
+      "sort": 20,
+      "note": null,
+      "requires_structure": "oil_extractor_hp_b4"
+    },
+    {
+      "id": "ranch",
+      "name": "가축 목장",
+      "method": "auto",
+      "place": "거점③ 농사",
+      "icon": "🐑",
+      "sort": 30,
+      "note": null,
+      "requires_structure": "ranch_b3"
+    },
+    {
+      "id": "hunt_fire",
+      "name": "화염 팰 사냥",
+      "method": "manual",
+      "place": "화산 지대",
+      "icon": "🔥",
+      "sort": 40,
+      "note": "최대 병목. 발화 기관 요구량이 가장 크다.",
+      "requires_structure": null
+    },
+    {
+      "id": "hunt_elec",
+      "name": "번개 팰 사냥",
+      "method": "manual",
+      "place": null,
+      "icon": "⚡",
+      "sort": 50,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "hunt_oil",
+      "name": "기름 드롭 팰 사냥",
+      "method": "manual",
+      "place": "그린모스 등",
+      "icon": "🫧",
+      "sort": 60,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "hunt_poison",
+      "name": "독 팰 사냥",
+      "method": "manual",
+      "place": null,
+      "icon": "☠",
+      "sort": 70,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "hunt_water",
+      "name": "물 팰 사냥",
+      "method": "manual",
+      "place": null,
+      "icon": "💧",
+      "sort": 80,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "hunt_ice",
+      "name": "얼음 팰 사냥",
+      "method": "manual",
+      "place": null,
+      "icon": "❄",
+      "sort": 90,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "butcher",
+      "name": "팰 해체",
+      "method": "manual",
+      "place": null,
+      "icon": "🔪",
+      "sort": 100,
+      "note": null,
+      "requires_structure": null
+    },
+    {
+      "id": "worldtree",
+      "name": "세계수 원정",
+      "method": "manual",
+      "place": "세계수",
+      "icon": "🌳",
+      "sort": 110,
+      "note": "성수는 1.0.3 에서 필드 보스 20~30개 확정 드롭. 보스 100회면 채워진다.",
+      "requires_structure": null
+    },
+    {
+      "id": "relic",
+      "name": "유물·던전",
+      "method": "manual",
+      "place": null,
+      "icon": "🏺",
+      "sort": 120,
+      "note": null,
+      "requires_structure": null
+    }
+  ],
+  "items": [
+    {
+      "id": "metal_ore",
+      "name": "금속 광석",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 10,
+      "note": null
+    },
+    {
+      "id": "coal",
+      "name": "석탄",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 20,
+      "note": "물질 생성기로 생산 가능 → 석탄 채굴장은 짓지 않는다"
+    },
+    {
+      "id": "stone",
+      "name": "돌",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 30,
+      "note": null
+    },
+    {
+      "id": "pure_quartz",
+      "name": "순수한 석영",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 40,
+      "note": null
+    },
+    {
+      "id": "solite_ore",
+      "name": "솔라이트 광석",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 50,
+      "note": "솔라이트 주괴와 팰키사이트 주괴 양쪽에 들어가 수요가 두 갈래로 갈린다"
+    },
+    {
+      "id": "sulfur",
+      "name": "유황",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 60,
+      "note": null
+    },
+    {
+      "id": "wood",
+      "name": "목재",
+      "category": "wood",
+      "source_id": "generator",
+      "sort": 70,
+      "note": "상인 구매가 더 싸다. 벌목 팰은 키울 가치가 낮다."
+    },
+    {
+      "id": "chromite",
+      "name": "크로마이트",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 80,
+      "note": null
+    },
+    {
+      "id": "hexo_quartz",
+      "name": "헥소 석영",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 90,
+      "note": null
+    },
+    {
+      "id": "paldium",
+      "name": "팰지움 파편",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 100,
+      "note": "물질 생성기 직접 생산 기준 (돌 5개 가공 루트 미사용)"
+    },
+    {
+      "id": "hard_wood",
+      "name": "단단한 목재",
+      "category": "wood",
+      "source_id": "generator",
+      "sort": 110,
+      "note": null
+    },
+    {
+      "id": "coralium_ore",
+      "name": "코랄리움 광석",
+      "category": "ore",
+      "source_id": "generator",
+      "sort": 120,
+      "note": null
+    },
+    {
+      "id": "crude_oil",
+      "name": "원유",
+      "category": "misc",
+      "source_id": "oil",
+      "sort": 130,
+      "note": null
+    },
+    {
+      "id": "wool",
+      "name": "양털",
+      "category": "misc",
+      "source_id": "ranch",
+      "sort": 140,
+      "note": null
+    },
+    {
+      "id": "flame_organ",
+      "name": "발화 기관",
+      "category": "organ",
+      "source_id": "hunt_fire",
+      "sort": 150,
+      "note": "화염 속성 팰"
+    },
+    {
+      "id": "electric_organ",
+      "name": "발전 기관",
+      "category": "organ",
+      "source_id": "hunt_elec",
+      "sort": 160,
+      "note": "번개 속성 팰"
+    },
+    {
+      "id": "hq_pal_oil",
+      "name": "고급 팰 기름",
+      "category": "organ",
+      "source_id": "hunt_oil",
+      "sort": 170,
+      "note": "기름 드롭 팰(그린모스 등)"
+    },
+    {
+      "id": "venom_gland",
+      "name": "독샘",
+      "category": "organ",
+      "source_id": "hunt_poison",
+      "sort": 180,
+      "note": "독 속성 팰"
+    },
+    {
+      "id": "aqua_slime",
+      "name": "수생 팰의 점액",
+      "category": "organ",
+      "source_id": "hunt_water",
+      "sort": 190,
+      "note": "물 속성 팰"
+    },
+    {
+      "id": "ice_organ",
+      "name": "빙결 기관",
+      "category": "organ",
+      "source_id": "hunt_ice",
+      "sort": 200,
+      "note": "얼음 속성 팰"
+    },
+    {
+      "id": "bone",
+      "name": "뼈",
+      "category": "organ",
+      "source_id": "butcher",
+      "sort": 210,
+      "note": null
+    },
+    {
+      "id": "leather",
+      "name": "가죽",
+      "category": "organ",
+      "source_id": "butcher",
+      "sort": 220,
+      "note": null
+    },
+    {
+      "id": "palkicite_ore",
+      "name": "팰키사이트 광석",
+      "category": "ore",
+      "source_id": "worldtree",
+      "sort": 230,
+      "note": "세계수에서만 나온다. 최대 병목."
+    },
+    {
+      "id": "sacred_water",
+      "name": "세계수의 성수",
+      "category": "misc",
+      "source_id": "worldtree",
+      "sort": 240,
+      "note": null
+    },
+    {
+      "id": "mystic_wood",
+      "name": "신비한 목재",
+      "category": "wood",
+      "source_id": "worldtree",
+      "sort": 250,
+      "note": null
+    },
+    {
+      "id": "ancient_core",
+      "name": "고대 문명의 코어",
+      "category": "relic",
+      "source_id": "relic",
+      "sort": 260,
+      "note": null
+    },
+    {
+      "id": "ancient_part",
+      "name": "고대 문명의 부품",
+      "category": "relic",
+      "source_id": "relic",
+      "sort": 270,
+      "note": null
+    },
+    {
+      "id": "fiber",
+      "name": "섬유",
+      "category": "misc",
+      "source_id": null,
+      "sort": 300,
+      "note": null
+    },
+    {
+      "id": "charcoal",
+      "name": "숯",
+      "category": "misc",
+      "source_id": null,
+      "sort": 310,
+      "note": null
+    },
+    {
+      "id": "cement",
+      "name": "시멘트",
+      "category": "misc",
+      "source_id": null,
+      "sort": 320,
+      "note": null
+    },
+    {
+      "id": "hq_cloth",
+      "name": "상급 천",
+      "category": "misc",
+      "source_id": null,
+      "sort": 330,
+      "note": null
+    },
+    {
+      "id": "carbon_fiber",
+      "name": "카본 섬유",
+      "category": "part",
+      "source_id": null,
+      "sort": 340,
+      "note": null
+    },
+    {
+      "id": "polymer",
+      "name": "폴리머",
+      "category": "part",
+      "source_id": null,
+      "sort": 350,
+      "note": null
+    },
+    {
+      "id": "corrosive",
+      "name": "부식성 용액",
+      "category": "part",
+      "source_id": null,
+      "sort": 360,
+      "note": null
+    },
+    {
+      "id": "hexolite",
+      "name": "헥소라이트",
+      "category": "part",
+      "source_id": null,
+      "sort": 370,
+      "note": null
+    },
+    {
+      "id": "cryo_medium",
+      "name": "극저온 냉각 매체",
+      "category": "part",
+      "source_id": null,
+      "sort": 380,
+      "note": null
+    },
+    {
+      "id": "metal_ingot",
+      "name": "금속 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 400,
+      "note": null
+    },
+    {
+      "id": "refined_ingot",
+      "name": "제련 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 410,
+      "note": null
+    },
+    {
+      "id": "pal_metal_ingot",
+      "name": "팰 금속 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 420,
+      "note": null
+    },
+    {
+      "id": "coralium_ingot",
+      "name": "코랄리움 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 430,
+      "note": null
+    },
+    {
+      "id": "solite_ingot",
+      "name": "솔라이트 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 440,
+      "note": null
+    },
+    {
+      "id": "palkicite_ingot",
+      "name": "팰키사이트 주괴",
+      "category": "ingot",
+      "source_id": null,
+      "sort": 450,
+      "note": "고대 문명 화로에서만 제련된다. 화로 1대가 나머지 전부의 선행 조건."
+    },
+    {
+      "id": "nail",
+      "name": "못",
+      "category": "part",
+      "source_id": null,
+      "sort": 500,
+      "note": null
+    },
+    {
+      "id": "plank",
+      "name": "나무 판자",
+      "category": "part",
+      "source_id": null,
+      "sort": 510,
+      "note": null
+    },
+    {
+      "id": "hq_plank",
+      "name": "상급 나무 판자",
+      "category": "part",
+      "source_id": null,
+      "sort": 520,
+      "note": null
+    },
+    {
+      "id": "plastil",
+      "name": "플라스틸",
+      "category": "part",
+      "source_id": null,
+      "sort": 530,
+      "note": null
+    },
+    {
+      "id": "circuit_board",
+      "name": "전자기판",
+      "category": "part",
+      "source_id": null,
+      "sort": 540,
+      "note": "설계도 8장의 \"회로 기판\"은 이 항목으로 본다"
+    },
+    {
+      "id": "bio_battery",
+      "name": "바이오 배터리",
+      "category": "part",
+      "source_id": null,
+      "sort": 550,
+      "note": null
+    },
+    {
+      "id": "superheat_core",
+      "name": "초고열 코어",
+      "category": "part",
+      "source_id": null,
+      "sort": 560,
+      "note": null
+    },
+    {
+      "id": "computer",
+      "name": "컴퓨터",
+      "category": "part",
+      "source_id": null,
+      "sort": 600,
+      "note": "982개 중 800개가 AI 코어용이다"
+    },
+    {
+      "id": "ai_core",
+      "name": "AI 코어",
+      "category": "part",
+      "source_id": null,
+      "sort": 610,
+      "note": "배합기 3대 = 150개. 이 계산서 전체를 지배한다."
+    }
+  ],
+  "recipes": [
+    {
+      "output_id": "carbon_fiber",
+      "input_id": "coal",
+      "qty": 2,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "carbon_fiber",
+      "input_id": "flame_organ",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "cement",
+      "input_id": "aqua_slime",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "cement",
+      "input_id": "bone",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "cement",
+      "input_id": "stone",
+      "qty": 20,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "charcoal",
+      "input_id": "wood",
+      "qty": 2,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "corrosive",
+      "input_id": "sulfur",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "corrosive",
+      "input_id": "venom_gland",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "cryo_medium",
+      "input_id": "aqua_slime",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "cryo_medium",
+      "input_id": "ice_organ",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "fiber",
+      "input_id": "wood",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "hexolite",
+      "input_id": "chromite",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "hexolite",
+      "input_id": "hexo_quartz",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "hq_cloth",
+      "input_id": "leather",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "hq_cloth",
+      "input_id": "wool",
+      "qty": 10,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "polymer",
+      "input_id": "hq_pal_oil",
+      "qty": 2,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "polymer",
+      "input_id": "sulfur",
+      "qty": 1,
+      "yield": 1,
+      "tier": 1
+    },
+    {
+      "output_id": "coralium_ingot",
+      "input_id": "coal",
+      "qty": 5,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "coralium_ingot",
+      "input_id": "coralium_ore",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "metal_ingot",
+      "input_id": "metal_ore",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "pal_metal_ingot",
+      "input_id": "metal_ore",
+      "qty": 4,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "pal_metal_ingot",
+      "input_id": "paldium",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "pal_metal_ingot",
+      "input_id": "pure_quartz",
+      "qty": 1,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "palkicite_ingot",
+      "input_id": "palkicite_ore",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "palkicite_ingot",
+      "input_id": "sacred_water",
+      "qty": 1,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "palkicite_ingot",
+      "input_id": "solite_ore",
+      "qty": 1,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "refined_ingot",
+      "input_id": "coal",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "refined_ingot",
+      "input_id": "metal_ore",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "solite_ingot",
+      "input_id": "pure_quartz",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "solite_ingot",
+      "input_id": "solite_ore",
+      "qty": 2,
+      "yield": 1,
+      "tier": 2
+    },
+    {
+      "output_id": "bio_battery",
+      "input_id": "carbon_fiber",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "bio_battery",
+      "input_id": "electric_organ",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "bio_battery",
+      "input_id": "refined_ingot",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "circuit_board",
+      "input_id": "polymer",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "circuit_board",
+      "input_id": "pure_quartz",
+      "qty": 2,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "hq_plank",
+      "input_id": "hard_wood",
+      "qty": 10,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "hq_plank",
+      "input_id": "hq_cloth",
+      "qty": 2,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "hq_plank",
+      "input_id": "wood",
+      "qty": 10,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "nail",
+      "input_id": "metal_ingot",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "plank",
+      "input_id": "fiber",
+      "qty": 5,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "plank",
+      "input_id": "nail",
+      "qty": 1,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "plank",
+      "input_id": "wood",
+      "qty": 10,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "plastil",
+      "input_id": "crude_oil",
+      "qty": 2,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "plastil",
+      "input_id": "metal_ore",
+      "qty": 5,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "superheat_core",
+      "input_id": "coal",
+      "qty": 8,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "superheat_core",
+      "input_id": "corrosive",
+      "qty": 2,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "superheat_core",
+      "input_id": "flame_organ",
+      "qty": 4,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "superheat_core",
+      "input_id": "hexolite",
+      "qty": 2,
+      "yield": 1,
+      "tier": 3
+    },
+    {
+      "output_id": "ai_core",
+      "input_id": "ancient_core",
+      "qty": 1,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "ai_core",
+      "input_id": "computer",
+      "qty": 5,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "ai_core",
+      "input_id": "solite_ingot",
+      "qty": 10,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "ai_core",
+      "input_id": "superheat_core",
+      "qty": 2,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "computer",
+      "input_id": "bio_battery",
+      "qty": 2,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "computer",
+      "input_id": "carbon_fiber",
+      "qty": 2,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "computer",
+      "input_id": "circuit_board",
+      "qty": 2,
+      "yield": 1,
+      "tier": 4
+    },
+    {
+      "output_id": "computer",
+      "input_id": "plastil",
+      "qty": 3,
+      "yield": 1,
+      "tier": 4
+    }
+  ],
+  "bases": [
+    {
+      "id": 1,
+      "name": "① 메인",
+      "role": "제련 + 제작 + 무기·탄약",
+      "weight": 2.5,
+      "pal_slots": 20,
+      "note": "전력 약 14,000/초. 넓은 평지 (광맥 불필요)"
+    },
+    {
+      "id": 2,
+      "name": "② 자원",
+      "role": "물질 생성기 + 석탄",
+      "weight": 3,
+      "pal_slots": 20,
+      "note": "전력 약 3,200/초. 석탄 광맥 (-170,-215 추천)"
+    },
+    {
+      "id": 3,
+      "name": "③ 농사",
+      "role": "재배기 + 목장 + 부엌",
+      "weight": 1.5,
+      "pal_slots": 20,
+      "note": "평지, 물가"
+    },
+    {
+      "id": 4,
+      "name": "④ 배합·원유",
+      "role": "배합기 + 고압 원유",
+      "weight": 2,
+      "pal_slots": 20,
+      "note": "전력 약 9,600/초. 유전 3포인트 또는 평지"
+    }
+  ],
+  "structures": [
+    {
+      "id": "bed_b1",
+      "name": "고대 문명 팰 침대",
+      "base_id": 1,
+      "count": 20,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 0.5/s, 회복 +100%"
+    },
+    {
+      "id": "bed_b2",
+      "name": "고대 문명 팰 침대",
+      "base_id": 2,
+      "count": 20,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 0.5/s, 회복 +100%"
+    },
+    {
+      "id": "bed_b3",
+      "name": "고대 문명 팰 침대",
+      "base_id": 3,
+      "count": 20,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 0.5/s, 회복 +100%"
+    },
+    {
+      "id": "bed_b4",
+      "name": "고대 문명 팰 침대",
+      "base_id": 4,
+      "count": 20,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 0.5/s, 회복 +100%"
+    },
+    {
+      "id": "bigkitchen_b1",
+      "name": "대형 부엌",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 3,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "bigkitchen_b2",
+      "name": "대형 부엌",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 3,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "bigkitchen_b4",
+      "name": "대형 부엌",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 3,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "breeding_b4",
+      "name": "고대 문명 배합기",
+      "base_id": 4,
+      "count": 3,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 4,
+      "build_order": 4,
+      "note": "기술 76, 슬롯 10. AI 코어 150개가 여기 들어간다."
+    },
+    {
+      "id": "capacitor_b1",
+      "name": "축전기",
+      "base_id": 1,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "용량 100만"
+    },
+    {
+      "id": "capacitor_b2",
+      "name": "축전기",
+      "base_id": 2,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "용량 100만"
+    },
+    {
+      "id": "capacitor_b3",
+      "name": "축전기",
+      "base_id": 3,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "용량 100만"
+    },
+    {
+      "id": "capacitor_b4",
+      "name": "축전기",
+      "base_id": 4,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "용량 100만"
+    },
+    {
+      "id": "clinic_b1",
+      "name": "고대 문명 진료소",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "제약 팰 1"
+    },
+    {
+      "id": "clinic_b2",
+      "name": "고대 문명 진료소",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "제약 팰 1"
+    },
+    {
+      "id": "clinic_b3",
+      "name": "고대 문명 진료소",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "제약 팰 1"
+    },
+    {
+      "id": "clinic_b4",
+      "name": "고대 문명 진료소",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "제약 팰 1"
+    },
+    {
+      "id": "coldfeedbox_b1",
+      "name": "보냉 먹이 상자",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": "냉각 팰 1"
+    },
+    {
+      "id": "coldfeedbox_b2",
+      "name": "보냉 먹이 상자",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": "냉각 팰 1"
+    },
+    {
+      "id": "coldfeedbox_b3",
+      "name": "보냉 먹이 상자",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": "냉각 팰 1"
+    },
+    {
+      "id": "coldfeedbox_b4",
+      "name": "보냉 먹이 상자",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": "냉각 팰 1"
+    },
+    {
+      "id": "factory_b1",
+      "name": "고도 문명 작업 공장",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 6,
+      "build_order": 3,
+      "note": "컴퓨터·AI 코어 제작. 수작업 4마리"
+    },
+    {
+      "id": "feedbox_b1",
+      "name": "먹이 상자",
+      "base_id": 1,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "feedbox_b2",
+      "name": "먹이 상자",
+      "base_id": 2,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "feedbox_b3",
+      "name": "먹이 상자",
+      "base_id": 3,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "feedbox_b4",
+      "name": "먹이 상자",
+      "base_id": 4,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "furnace_b1",
+      "name": "고대 문명 화로",
+      "base_id": 1,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 10,
+      "build_order": 1,
+      "note": "팰키사이트·솔라이트 주괴 라인. 여기부터 모든 게 시작된다."
+    },
+    {
+      "id": "guildchest_b1",
+      "name": "길드 상자",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 4,
+      "note": "거점 간 물자 이동을 해결한다 (설계도 14장)"
+    },
+    {
+      "id": "guildchest_b2",
+      "name": "길드 상자",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 4,
+      "note": "거점 간 물자 이동을 해결한다 (설계도 14장)"
+    },
+    {
+      "id": "guildchest_b3",
+      "name": "길드 상자",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 4,
+      "note": "거점 간 물자 이동을 해결한다 (설계도 14장)"
+    },
+    {
+      "id": "guildchest_b4",
+      "name": "길드 상자",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 4,
+      "note": "거점 간 물자 이동을 해결한다 (설계도 14장)"
+    },
+    {
+      "id": "hotspring_b1",
+      "name": "고대 문명 온천",
+      "base_id": 1,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN +2.00/s"
+    },
+    {
+      "id": "hotspring_b2",
+      "name": "고대 문명 온천",
+      "base_id": 2,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN +2.00/s"
+    },
+    {
+      "id": "hotspring_b3",
+      "name": "고대 문명 온천",
+      "base_id": 3,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN +2.00/s"
+    },
+    {
+      "id": "hotspring_b4",
+      "name": "고대 문명 온천",
+      "base_id": 4,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN +2.00/s"
+    },
+    {
+      "id": "hqbox_b1",
+      "name": "고도 문명 상자",
+      "base_id": 1,
+      "count": 8,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "hqbox_b2",
+      "name": "고도 문명 상자",
+      "base_id": 2,
+      "count": 8,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "kitchen_b3",
+      "name": "고대 문명 부엌",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "기술 70. 상시 가동이 아니라 1대면 충분"
+    },
+    {
+      "id": "matter_generator_b2",
+      "name": "고대 문명 물질 생성기",
+      "base_id": 2,
+      "count": 5,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 9,
+      "build_order": 2,
+      "note": "기술 78. 광물 12종 자동화. 1대만 지어도 파밍이 통째로 풀린다."
+    },
+    {
+      "id": "mill_b3",
+      "name": "제분기",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "oil_extractor_hp_b4",
+      "name": "원유 추출기(고압형)",
+      "base_id": 4,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 7,
+      "build_order": 4,
+      "note": "유전 위에 지을 수 있으면 일반형이 훨씬 싸다"
+    },
+    {
+      "id": "palbox_b1",
+      "name": "팰 상자",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 1,
+      "note": null
+    },
+    {
+      "id": "palbox_b2",
+      "name": "팰 상자",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 1,
+      "note": null
+    },
+    {
+      "id": "palbox_b3",
+      "name": "팰 상자",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 1,
+      "note": null
+    },
+    {
+      "id": "palbox_b4",
+      "name": "팰 상자",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 1,
+      "note": null
+    },
+    {
+      "id": "plantation_b3",
+      "name": "고대 문명 재배기",
+      "base_id": 3,
+      "count": 4,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 3,
+      "build_order": 5,
+      "note": "기술 78"
+    },
+    {
+      "id": "powerplant_b1",
+      "name": "고대 문명 발전기",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 8,
+      "build_order": 1,
+      "note": null
+    },
+    {
+      "id": "powerplant_b2",
+      "name": "고대 문명 발전기",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 8,
+      "build_order": 2,
+      "note": null
+    },
+    {
+      "id": "powerplant_b3",
+      "name": "고대 문명 발전기",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 8,
+      "build_order": 5,
+      "note": null
+    },
+    {
+      "id": "powerplant_b4",
+      "name": "고대 문명 발전기",
+      "base_id": 4,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 8,
+      "build_order": 4,
+      "note": null
+    },
+    {
+      "id": "ranch_b3",
+      "name": "가축 목장",
+      "base_id": 3,
+      "count": 4,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 5,
+      "note": "양털 자동 생산"
+    },
+    {
+      "id": "watchtower_b1",
+      "name": "고대 문명 감시대",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 억제 15"
+    },
+    {
+      "id": "watchtower_b2",
+      "name": "고대 문명 감시대",
+      "base_id": 2,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 억제 15"
+    },
+    {
+      "id": "watchtower_b3",
+      "name": "고대 문명 감시대",
+      "base_id": 3,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 억제 15"
+    },
+    {
+      "id": "watchtower_b4",
+      "name": "고대 문명 감시대",
+      "base_id": 4,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 1,
+      "build_order": 6,
+      "note": "SAN 억제 15"
+    },
+    {
+      "id": "weaponfactory_b1",
+      "name": "고도 문명 무기 공장",
+      "base_id": 1,
+      "count": 1,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 2,
+      "build_order": 3,
+      "note": "무기·탄약 대량 생산. 수작업 4마리"
+    },
+    {
+      "id": "workbench_b1",
+      "name": "고대 문명 작업대",
+      "base_id": 1,
+      "count": 2,
+      "power": null,
+      "req_aptitude": null,
+      "unlock_score": 5,
+      "build_order": 3,
+      "note": "팰키사이트 티어 장비 전용. 수작업6 1 + 제약6 1"
+    }
+  ],
+  "costs": [
+    {
+      "structure_id": "bed_b1",
+      "item_id": "mystic_wood",
+      "qty": 3
+    },
+    {
+      "structure_id": "bed_b1",
+      "item_id": "sacred_water",
+      "qty": 2
+    },
+    {
+      "structure_id": "bed_b1",
+      "item_id": "solite_ingot",
+      "qty": 10
+    },
+    {
+      "structure_id": "bed_b2",
+      "item_id": "mystic_wood",
+      "qty": 3
+    },
+    {
+      "structure_id": "bed_b2",
+      "item_id": "sacred_water",
+      "qty": 2
+    },
+    {
+      "structure_id": "bed_b2",
+      "item_id": "solite_ingot",
+      "qty": 10
+    },
+    {
+      "structure_id": "bed_b3",
+      "item_id": "mystic_wood",
+      "qty": 3
+    },
+    {
+      "structure_id": "bed_b3",
+      "item_id": "sacred_water",
+      "qty": 2
+    },
+    {
+      "structure_id": "bed_b3",
+      "item_id": "solite_ingot",
+      "qty": 10
+    },
+    {
+      "structure_id": "bed_b4",
+      "item_id": "mystic_wood",
+      "qty": 3
+    },
+    {
+      "structure_id": "bed_b4",
+      "item_id": "sacred_water",
+      "qty": 2
+    },
+    {
+      "structure_id": "bed_b4",
+      "item_id": "solite_ingot",
+      "qty": 10
+    },
+    {
+      "structure_id": "bigkitchen_b1",
+      "item_id": "cement",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b1",
+      "item_id": "charcoal",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b1",
+      "item_id": "cryo_medium",
+      "qty": 13
+    },
+    {
+      "structure_id": "bigkitchen_b1",
+      "item_id": "hq_plank",
+      "qty": 25
+    },
+    {
+      "structure_id": "bigkitchen_b2",
+      "item_id": "cement",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b2",
+      "item_id": "charcoal",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b2",
+      "item_id": "cryo_medium",
+      "qty": 13
+    },
+    {
+      "structure_id": "bigkitchen_b2",
+      "item_id": "hq_plank",
+      "qty": 25
+    },
+    {
+      "structure_id": "bigkitchen_b4",
+      "item_id": "cement",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b4",
+      "item_id": "charcoal",
+      "qty": 200
+    },
+    {
+      "structure_id": "bigkitchen_b4",
+      "item_id": "cryo_medium",
+      "qty": 13
+    },
+    {
+      "structure_id": "bigkitchen_b4",
+      "item_id": "hq_plank",
+      "qty": 25
+    },
+    {
+      "structure_id": "breeding_b4",
+      "item_id": "ai_core",
+      "qty": 50
+    },
+    {
+      "structure_id": "breeding_b4",
+      "item_id": "ancient_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "breeding_b4",
+      "item_id": "ancient_part",
+      "qty": 30
+    },
+    {
+      "structure_id": "breeding_b4",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "capacitor_b1",
+      "item_id": "corrosive",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b1",
+      "item_id": "cryo_medium",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b1",
+      "item_id": "electric_organ",
+      "qty": 20
+    },
+    {
+      "structure_id": "capacitor_b1",
+      "item_id": "metal_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "capacitor_b2",
+      "item_id": "corrosive",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b2",
+      "item_id": "cryo_medium",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b2",
+      "item_id": "electric_organ",
+      "qty": 20
+    },
+    {
+      "structure_id": "capacitor_b2",
+      "item_id": "metal_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "capacitor_b3",
+      "item_id": "corrosive",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b3",
+      "item_id": "cryo_medium",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b3",
+      "item_id": "electric_organ",
+      "qty": 20
+    },
+    {
+      "structure_id": "capacitor_b3",
+      "item_id": "metal_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "capacitor_b4",
+      "item_id": "corrosive",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b4",
+      "item_id": "cryo_medium",
+      "qty": 5
+    },
+    {
+      "structure_id": "capacitor_b4",
+      "item_id": "electric_organ",
+      "qty": 20
+    },
+    {
+      "structure_id": "capacitor_b4",
+      "item_id": "metal_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "clinic_b1",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "clinic_b1",
+      "item_id": "computer",
+      "qty": 15
+    },
+    {
+      "structure_id": "clinic_b1",
+      "item_id": "sacred_water",
+      "qty": 45
+    },
+    {
+      "structure_id": "clinic_b1",
+      "item_id": "solite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "clinic_b2",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "clinic_b2",
+      "item_id": "computer",
+      "qty": 15
+    },
+    {
+      "structure_id": "clinic_b2",
+      "item_id": "sacred_water",
+      "qty": 45
+    },
+    {
+      "structure_id": "clinic_b2",
+      "item_id": "solite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "clinic_b3",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "clinic_b3",
+      "item_id": "computer",
+      "qty": 15
+    },
+    {
+      "structure_id": "clinic_b3",
+      "item_id": "sacred_water",
+      "qty": 45
+    },
+    {
+      "structure_id": "clinic_b3",
+      "item_id": "solite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "clinic_b4",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "clinic_b4",
+      "item_id": "computer",
+      "qty": 15
+    },
+    {
+      "structure_id": "clinic_b4",
+      "item_id": "sacred_water",
+      "qty": 45
+    },
+    {
+      "structure_id": "clinic_b4",
+      "item_id": "solite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "coldfeedbox_b1",
+      "item_id": "cryo_medium",
+      "qty": 15
+    },
+    {
+      "structure_id": "coldfeedbox_b1",
+      "item_id": "pal_metal_ingot",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b1",
+      "item_id": "plastil",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b2",
+      "item_id": "cryo_medium",
+      "qty": 15
+    },
+    {
+      "structure_id": "coldfeedbox_b2",
+      "item_id": "pal_metal_ingot",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b2",
+      "item_id": "plastil",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b3",
+      "item_id": "cryo_medium",
+      "qty": 15
+    },
+    {
+      "structure_id": "coldfeedbox_b3",
+      "item_id": "pal_metal_ingot",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b3",
+      "item_id": "plastil",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b4",
+      "item_id": "cryo_medium",
+      "qty": 15
+    },
+    {
+      "structure_id": "coldfeedbox_b4",
+      "item_id": "pal_metal_ingot",
+      "qty": 20
+    },
+    {
+      "structure_id": "coldfeedbox_b4",
+      "item_id": "plastil",
+      "qty": 20
+    },
+    {
+      "structure_id": "factory_b1",
+      "item_id": "bio_battery",
+      "qty": 20
+    },
+    {
+      "structure_id": "factory_b1",
+      "item_id": "computer",
+      "qty": 30
+    },
+    {
+      "structure_id": "factory_b1",
+      "item_id": "coralium_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "factory_b1",
+      "item_id": "hexolite",
+      "qty": 50
+    },
+    {
+      "structure_id": "feedbox_b1",
+      "item_id": "wood",
+      "qty": 20
+    },
+    {
+      "structure_id": "feedbox_b2",
+      "item_id": "wood",
+      "qty": 20
+    },
+    {
+      "structure_id": "feedbox_b3",
+      "item_id": "wood",
+      "qty": 20
+    },
+    {
+      "structure_id": "feedbox_b4",
+      "item_id": "wood",
+      "qty": 20
+    },
+    {
+      "structure_id": "furnace_b1",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "furnace_b1",
+      "item_id": "computer",
+      "qty": 30
+    },
+    {
+      "structure_id": "furnace_b1",
+      "item_id": "coralium_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "furnace_b1",
+      "item_id": "superheat_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "guildchest_b1",
+      "item_id": "ancient_part",
+      "qty": 10
+    },
+    {
+      "structure_id": "guildchest_b1",
+      "item_id": "paldium",
+      "qty": 100
+    },
+    {
+      "structure_id": "guildchest_b1",
+      "item_id": "refined_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "guildchest_b2",
+      "item_id": "ancient_part",
+      "qty": 10
+    },
+    {
+      "structure_id": "guildchest_b2",
+      "item_id": "paldium",
+      "qty": 100
+    },
+    {
+      "structure_id": "guildchest_b2",
+      "item_id": "refined_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "guildchest_b3",
+      "item_id": "ancient_part",
+      "qty": 10
+    },
+    {
+      "structure_id": "guildchest_b3",
+      "item_id": "paldium",
+      "qty": 100
+    },
+    {
+      "structure_id": "guildchest_b3",
+      "item_id": "refined_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "guildchest_b4",
+      "item_id": "ancient_part",
+      "qty": 10
+    },
+    {
+      "structure_id": "guildchest_b4",
+      "item_id": "paldium",
+      "qty": 100
+    },
+    {
+      "structure_id": "guildchest_b4",
+      "item_id": "refined_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "hotspring_b1",
+      "item_id": "cryo_medium",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b1",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "hotspring_b1",
+      "item_id": "sacred_water",
+      "qty": 10
+    },
+    {
+      "structure_id": "hotspring_b1",
+      "item_id": "superheat_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b2",
+      "item_id": "cryo_medium",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b2",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "hotspring_b2",
+      "item_id": "sacred_water",
+      "qty": 10
+    },
+    {
+      "structure_id": "hotspring_b2",
+      "item_id": "superheat_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b3",
+      "item_id": "cryo_medium",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b3",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "hotspring_b3",
+      "item_id": "sacred_water",
+      "qty": 10
+    },
+    {
+      "structure_id": "hotspring_b3",
+      "item_id": "superheat_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b4",
+      "item_id": "cryo_medium",
+      "qty": 20
+    },
+    {
+      "structure_id": "hotspring_b4",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "hotspring_b4",
+      "item_id": "sacred_water",
+      "qty": 10
+    },
+    {
+      "structure_id": "hotspring_b4",
+      "item_id": "superheat_core",
+      "qty": 20
+    },
+    {
+      "structure_id": "hqbox_b1",
+      "item_id": "carbon_fiber",
+      "qty": 20
+    },
+    {
+      "structure_id": "hqbox_b1",
+      "item_id": "computer",
+      "qty": 2
+    },
+    {
+      "structure_id": "hqbox_b1",
+      "item_id": "hexolite",
+      "qty": 20
+    },
+    {
+      "structure_id": "hqbox_b2",
+      "item_id": "carbon_fiber",
+      "qty": 20
+    },
+    {
+      "structure_id": "hqbox_b2",
+      "item_id": "computer",
+      "qty": 2
+    },
+    {
+      "structure_id": "hqbox_b2",
+      "item_id": "hexolite",
+      "qty": 20
+    },
+    {
+      "structure_id": "kitchen_b3",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "kitchen_b3",
+      "item_id": "cryo_medium",
+      "qty": 50
+    },
+    {
+      "structure_id": "kitchen_b3",
+      "item_id": "solite_ingot",
+      "qty": 80
+    },
+    {
+      "structure_id": "kitchen_b3",
+      "item_id": "superheat_core",
+      "qty": 30
+    },
+    {
+      "structure_id": "matter_generator_b2",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "matter_generator_b2",
+      "item_id": "palkicite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "mill_b3",
+      "item_id": "metal_ingot",
+      "qty": 10
+    },
+    {
+      "structure_id": "mill_b3",
+      "item_id": "plank",
+      "qty": 10
+    },
+    {
+      "structure_id": "mill_b3",
+      "item_id": "stone",
+      "qty": 40
+    },
+    {
+      "structure_id": "oil_extractor_hp_b4",
+      "item_id": "ancient_part",
+      "qty": 10
+    },
+    {
+      "structure_id": "oil_extractor_hp_b4",
+      "item_id": "bio_battery",
+      "qty": 25
+    },
+    {
+      "structure_id": "oil_extractor_hp_b4",
+      "item_id": "circuit_board",
+      "qty": 25
+    },
+    {
+      "structure_id": "oil_extractor_hp_b4",
+      "item_id": "pal_metal_ingot",
+      "qty": 150
+    },
+    {
+      "structure_id": "palbox_b1",
+      "item_id": "paldium",
+      "qty": 1
+    },
+    {
+      "structure_id": "palbox_b1",
+      "item_id": "stone",
+      "qty": 3
+    },
+    {
+      "structure_id": "palbox_b1",
+      "item_id": "wood",
+      "qty": 8
+    },
+    {
+      "structure_id": "palbox_b2",
+      "item_id": "paldium",
+      "qty": 1
+    },
+    {
+      "structure_id": "palbox_b2",
+      "item_id": "stone",
+      "qty": 3
+    },
+    {
+      "structure_id": "palbox_b2",
+      "item_id": "wood",
+      "qty": 8
+    },
+    {
+      "structure_id": "palbox_b3",
+      "item_id": "paldium",
+      "qty": 1
+    },
+    {
+      "structure_id": "palbox_b3",
+      "item_id": "stone",
+      "qty": 3
+    },
+    {
+      "structure_id": "palbox_b3",
+      "item_id": "wood",
+      "qty": 8
+    },
+    {
+      "structure_id": "palbox_b4",
+      "item_id": "paldium",
+      "qty": 1
+    },
+    {
+      "structure_id": "palbox_b4",
+      "item_id": "stone",
+      "qty": 3
+    },
+    {
+      "structure_id": "palbox_b4",
+      "item_id": "wood",
+      "qty": 8
+    },
+    {
+      "structure_id": "plantation_b3",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "plantation_b3",
+      "item_id": "mystic_wood",
+      "qty": 100
+    },
+    {
+      "structure_id": "plantation_b3",
+      "item_id": "palkicite_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "plantation_b3",
+      "item_id": "sacred_water",
+      "qty": 50
+    },
+    {
+      "structure_id": "powerplant_b1",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "powerplant_b1",
+      "item_id": "electric_organ",
+      "qty": 200
+    },
+    {
+      "structure_id": "powerplant_b1",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "powerplant_b2",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "powerplant_b2",
+      "item_id": "electric_organ",
+      "qty": 200
+    },
+    {
+      "structure_id": "powerplant_b2",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "powerplant_b3",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "powerplant_b3",
+      "item_id": "electric_organ",
+      "qty": 200
+    },
+    {
+      "structure_id": "powerplant_b3",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "powerplant_b4",
+      "item_id": "ancient_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "powerplant_b4",
+      "item_id": "electric_organ",
+      "qty": 200
+    },
+    {
+      "structure_id": "powerplant_b4",
+      "item_id": "palkicite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "ranch_b3",
+      "item_id": "fiber",
+      "qty": 30
+    },
+    {
+      "structure_id": "ranch_b3",
+      "item_id": "stone",
+      "qty": 20
+    },
+    {
+      "structure_id": "ranch_b3",
+      "item_id": "wood",
+      "qty": 30
+    },
+    {
+      "structure_id": "watchtower_b1",
+      "item_id": "ancient_core",
+      "qty": 5
+    },
+    {
+      "structure_id": "watchtower_b1",
+      "item_id": "solite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "watchtower_b2",
+      "item_id": "ancient_core",
+      "qty": 5
+    },
+    {
+      "structure_id": "watchtower_b2",
+      "item_id": "solite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "watchtower_b3",
+      "item_id": "ancient_core",
+      "qty": 5
+    },
+    {
+      "structure_id": "watchtower_b3",
+      "item_id": "solite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "watchtower_b4",
+      "item_id": "ancient_core",
+      "qty": 5
+    },
+    {
+      "structure_id": "watchtower_b4",
+      "item_id": "solite_ingot",
+      "qty": 100
+    },
+    {
+      "structure_id": "weaponfactory_b1",
+      "item_id": "coralium_ingot",
+      "qty": 50
+    },
+    {
+      "structure_id": "weaponfactory_b1",
+      "item_id": "corrosive",
+      "qty": 30
+    },
+    {
+      "structure_id": "weaponfactory_b1",
+      "item_id": "superheat_core",
+      "qty": 10
+    },
+    {
+      "structure_id": "workbench_b1",
+      "item_id": "ai_core",
+      "qty": 5
+    },
+    {
+      "structure_id": "workbench_b1",
+      "item_id": "bio_battery",
+      "qty": 20
+    },
+    {
+      "structure_id": "workbench_b1",
+      "item_id": "solite_ingot",
+      "qty": 50
+    }
+  ],
+  "unlocks": [
+    {
+      "structure_id": "factory_b1",
+      "item_id": "ai_core"
+    },
+    {
+      "structure_id": "factory_b1",
+      "item_id": "computer"
+    },
+    {
+      "structure_id": "furnace_b1",
+      "item_id": "palkicite_ingot"
+    }
+  ]
+}

@@ -1,0 +1,969 @@
+{
+  "pals": [
+    {
+      "id": "alpha_sekhmet",
+      "name": "알파 세크메트",
+      "aptitudes": {
+        "mining": 6,
+        "handiwork": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "작업 속도 400%. 제약이 없어 고대 작업대에는 못 들어간다.",
+      "source": null,
+      "breed_from": [
+        "labradon",
+        "spradon"
+      ],
+      "breed_note": "라브라돈·스프라돈을 풀농축해 엔트리에 1마리씩 넣고 알을 줍는다"
+    },
+    {
+      "id": "anubis",
+      "name": "아누비스",
+      "aptitudes": {
+        "mining": 6,
+        "handiwork": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "azuribi",
+      "name": "아주리비",
+      "aptitudes": {
+        "watering": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "관개 전념",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "beautiflower",
+      "name": "뷰티플라워",
+      "aptitudes": {
+        "planting": 3
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "작물 성장 속도 +70%",
+      "source": "벚꽃섬",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "bellaruju",
+      "name": "벨라루주",
+      "aptitudes": {
+        "medicine": 6,
+        "handiwork": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "즉시 전력이 필요하면 레이드로 확보",
+      "source": "레이드",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "bingcheonma",
+      "name": "빙천마",
+      "aptitudes": {
+        "cooling": 7
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "binghouger",
+      "name": "빙호우거",
+      "aptitudes": {
+        "mining": 5,
+        "cooling": 8,
+        "lumbering": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "bittersheep",
+      "name": "비터쉽",
+      "aptitudes": {
+        "ranch": 1
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "포만도 감소 -15%. 양털.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "bloodcatty",
+      "name": "블러드캐티",
+      "aptitudes": {
+        "medicine": 6
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "brooming",
+      "name": "브루밍",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "gathering",
+      "partner": "채집 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "bulchorong",
+      "name": "불초롱",
+      "aptitudes": {
+        "kindling": 6,
+        "watering": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "불+관개 겸업",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "candysheep",
+      "name": "캔디쉽",
+      "aptitudes": {
+        "ranch": 1
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "포만도 감소 -10%. 양털.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "cattywizard",
+      "name": "캐티위자드",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "kindling",
+      "partner": "불 피우기 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "cosmodial",
+      "name": "코스모디얼",
+      "aptitudes": {
+        "lumbering": 8
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": "육성 가치 낮음 — 목재는 구매",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "dalbomi",
+      "name": "달보미",
+      "aptitudes": {
+        "medicine": 6,
+        "handiwork": 6
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": "어둠 속성이라 야행성",
+      "source": "천양향 필드 보스",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "eophwamu",
+      "name": "업화무",
+      "aptitudes": {
+        "kindling": 8
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": "세계수 이후",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "florina",
+      "name": "플로리나",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "planting",
+      "partner": "파종 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "gwiyobi",
+      "name": "귀요비",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "ranch",
+      "partner": "목장 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "jetragon",
+      "name": "제트래곤",
+      "aptitudes": {
+        "gathering": 8
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "jjariring",
+      "name": "짜리링",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "generating",
+      "partner": "발전 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "labradon",
+      "name": "라브라돈",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "알파 세크메트 배합 부모. 풀농축 필요.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "lilin",
+      "name": "릴린",
+      "aptitudes": {
+        "medicine": 6,
+        "planting": 7,
+        "gathering": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "liorine",
+      "name": "리오리네",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "watering",
+      "partner": "관개 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "lunarin",
+      "name": "루나린",
+      "aptitudes": {
+        "handiwork": 5
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "책 1권만 먹이면 수작업 6",
+      "source": "벚꽃섬",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "magmakaiser",
+      "name": "마그마카이저",
+      "aptitudes": {
+        "mining": 7,
+        "kindling": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "magnite",
+      "name": "마그나이트",
+      "aptitudes": {
+        "mining": 7,
+        "transport": 7
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "milcow",
+      "name": "밀카우",
+      "aptitudes": {
+        "ranch": 1
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "우유",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "monochrona",
+      "name": "모노크로나",
+      "aptitudes": {
+        "handiwork": 8
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "moslon",
+      "name": "모슬론",
+      "aptitudes": {
+        "medicine": 8
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "musully",
+      "name": "머슐리",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "medicine",
+      "partner": "제약 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "noksaju",
+      "name": "녹사주",
+      "aptitudes": {
+        "planting": 8
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": null,
+      "source": "세계수 레이드",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "nundaengi",
+      "name": "눈댕이",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "cooling",
+      "partner": "냉각 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "nureumbuk",
+      "name": "누름북",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "mining",
+      "partner": "채굴 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "nyangbat",
+      "name": "냥뱃",
+      "aptitudes": {
+        "mining": 6,
+        "transport": 6
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "pingto",
+      "name": "핑토",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "handiwork",
+      "partner": "수작업 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "plumlin",
+      "name": "플럼린",
+      "aptitudes": {
+        "planting": 3,
+        "gathering": 2
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "풀농축 시 수확량 +35%",
+      "source": "천락의 땅",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "pullesio",
+      "name": "풀레시오",
+      "aptitudes": {
+        "planting": 5,
+        "gathering": 5
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "알 생산 +20%",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "raigaruda",
+      "name": "라이가루다",
+      "aptitudes": {
+        "generating": 6
+      },
+      "nocturnal": true,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "sanryeong",
+      "name": "산령사슴",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": "lumbering",
+      "partner": "벌목 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "senko",
+      "name": "센코",
+      "aptitudes": {
+        "kindling": 6,
+        "handiwork": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "불+수작업 겸업",
+      "source": "천양향 필드 보스",
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "shaolong",
+      "name": "샤오롱",
+      "aptitudes": {
+        "watering": 8,
+        "gathering": 5
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "shellgadra",
+      "name": "셸가드라",
+      "aptitudes": {
+        "mining": 8
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "shogunbokchi",
+      "name": "쇼군복치",
+      "aptitudes": {
+        "watering": 6,
+        "generating": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "풀농축하면 관개 6이 되어 재배기까지 잡는다. 농축 3단계에서 멈출 것.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "spradon",
+      "name": "스프라돈",
+      "aptitudes": {},
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "알파 세크메트 배합 부모. 풀농축 필요.",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "terranite",
+      "name": "테라나이트",
+      "aptitudes": {
+        "mining": 7,
+        "transport": 7
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": null,
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "umpo",
+      "name": "움포",
+      "aptitudes": {
+        "transport": 6
+      },
+      "nocturnal": false,
+      "foreman": "transport",
+      "partner": "운반 반장",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "violeta",
+      "name": "비오레타",
+      "aptitudes": {
+        "gathering": 6
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "6종 겸업",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    },
+    {
+      "id": "voljex",
+      "name": "볼젝스",
+      "aptitudes": {
+        "transport": 4,
+        "generating": 8
+      },
+      "nocturnal": false,
+      "foreman": null,
+      "partner": "불면 필수",
+      "source": null,
+      "breed_from": [],
+      "breed_note": null
+    }
+  ],
+  "assignments": [
+    {
+      "id": "121",
+      "base_id": 1,
+      "role": "불 피우기 6+ (화로)",
+      "count": 2,
+      "pal_ids": [
+        "senko",
+        "eophwamu"
+      ],
+      "sort": 10,
+      "note": "세계수 이후 업화무로 교체"
+    },
+    {
+      "id": "122",
+      "base_id": 1,
+      "role": "냉각 6+ (화로)",
+      "count": 2,
+      "pal_ids": [
+        "bingcheonma",
+        "binghouger"
+      ],
+      "sort": 20,
+      "note": null
+    },
+    {
+      "id": "123",
+      "base_id": 1,
+      "role": "수작업 6+ (고대 작업대)",
+      "count": 2,
+      "pal_ids": [
+        "dalbomi",
+        "lunarin"
+      ],
+      "sort": 30,
+      "note": "알파 세크메트는 제약이 없어 여기엔 못 들어간다"
+    },
+    {
+      "id": "124",
+      "base_id": 1,
+      "role": "제약 6+ (고대 작업대)",
+      "count": 2,
+      "pal_ids": [
+        "dalbomi",
+        "moslon"
+      ],
+      "sort": 40,
+      "note": null
+    },
+    {
+      "id": "125",
+      "base_id": 1,
+      "role": "수작업 (작업 공장, 4자리)",
+      "count": 4,
+      "pal_ids": [
+        "alpha_sekhmet"
+      ],
+      "sort": 50,
+      "note": "작업 속도 400%. 모노크로나 대신 알파 세크메트로 통일."
+    },
+    {
+      "id": "126",
+      "base_id": 1,
+      "role": "수작업 (무기 공장, 4자리)",
+      "count": 4,
+      "pal_ids": [
+        "alpha_sekhmet",
+        "anubis"
+      ],
+      "sort": 60,
+      "note": "알파 세크메트 우선, 모자라면 아누비스"
+    },
+    {
+      "id": "127",
+      "base_id": 1,
+      "role": "발전 6+",
+      "count": 1,
+      "pal_ids": [
+        "shogunbokchi"
+      ],
+      "sort": 70,
+      "note": null
+    },
+    {
+      "id": "128",
+      "base_id": 1,
+      "role": "관개",
+      "count": 1,
+      "pal_ids": [
+        "bulchorong"
+      ],
+      "sort": 80,
+      "note": null
+    },
+    {
+      "id": "129",
+      "base_id": 1,
+      "role": "운반",
+      "count": 1,
+      "pal_ids": [
+        "magnite"
+      ],
+      "sort": 90,
+      "note": "산출물이 쌓이면 ②의 운반 팰을 잠깐 빌려온다"
+    },
+    {
+      "id": "130",
+      "base_id": 1,
+      "role": "반장",
+      "count": 1,
+      "pal_ids": [
+        "pingto"
+      ],
+      "sort": 100,
+      "note": "공장 8자리를 전부 강화하므로 여기가 가장 이득"
+    },
+    {
+      "id": "131",
+      "base_id": 2,
+      "role": "물질 생성기 (5대 × 1마리)",
+      "count": 5,
+      "pal_ids": [
+        "alpha_sekhmet",
+        "shellgadra"
+      ],
+      "sort": 10,
+      "note": "채굴 6 필요"
+    },
+    {
+      "id": "132",
+      "base_id": 2,
+      "role": "대형 부엌 (불 피우기)",
+      "count": 1,
+      "pal_ids": [
+        "magmakaiser"
+      ],
+      "sort": 20,
+      "note": null
+    },
+    {
+      "id": "133",
+      "base_id": 2,
+      "role": "발전 6+",
+      "count": 2,
+      "pal_ids": [
+        "shogunbokchi"
+      ],
+      "sort": 30,
+      "note": null
+    },
+    {
+      "id": "134",
+      "base_id": 2,
+      "role": "관개",
+      "count": 1,
+      "pal_ids": [
+        "bulchorong"
+      ],
+      "sort": 40,
+      "note": null
+    },
+    {
+      "id": "135",
+      "base_id": 2,
+      "role": "운반",
+      "count": 4,
+      "pal_ids": [
+        "magnite",
+        "terranite",
+        "nyangbat"
+      ],
+      "sort": 50,
+      "note": null
+    },
+    {
+      "id": "136",
+      "base_id": 2,
+      "role": "반장",
+      "count": 3,
+      "pal_ids": [
+        "nureumbuk",
+        "umpo",
+        "pingto"
+      ],
+      "sort": 60,
+      "note": null
+    },
+    {
+      "id": "137",
+      "base_id": 2,
+      "role": "교대 예비",
+      "count": 4,
+      "pal_ids": [],
+      "sort": 70,
+      "note": "야행성 개체"
+    },
+    {
+      "id": "138",
+      "base_id": 3,
+      "role": "파종 6+",
+      "count": 4,
+      "pal_ids": [
+        "plumlin",
+        "beautiflower",
+        "noksaju"
+      ],
+      "sort": 10,
+      "note": "플럼린·뷰티플라워는 농축 + 응용학 책 투자 필요"
+    },
+    {
+      "id": "139",
+      "base_id": 3,
+      "role": "채집 6+",
+      "count": 3,
+      "pal_ids": [
+        "jetragon",
+        "lilin"
+      ],
+      "sort": 20,
+      "note": null
+    },
+    {
+      "id": "140",
+      "base_id": 3,
+      "role": "관개 6+ (재배기·부엌 순회)",
+      "count": 2,
+      "pal_ids": [
+        "bulchorong"
+      ],
+      "sort": 30,
+      "note": null
+    },
+    {
+      "id": "141",
+      "base_id": 3,
+      "role": "부엌 (불 6 + 수작업 6)",
+      "count": 2,
+      "pal_ids": [
+        "bulchorong"
+      ],
+      "sort": 40,
+      "note": "수작업은 농사 팰이 비는 시간에 겸업"
+    },
+    {
+      "id": "142",
+      "base_id": 3,
+      "role": "목장",
+      "count": 4,
+      "pal_ids": [
+        "milcow",
+        "bittersheep",
+        "candysheep"
+      ],
+      "sort": 50,
+      "note": null
+    },
+    {
+      "id": "143",
+      "base_id": 3,
+      "role": "발전 6+",
+      "count": 2,
+      "pal_ids": [
+        "shogunbokchi"
+      ],
+      "sort": 60,
+      "note": "농축은 3단계에서 멈출 것 — 풀농축하면 관개 6이 되어 재배기까지 잡는다"
+    },
+    {
+      "id": "144",
+      "base_id": 3,
+      "role": "반장",
+      "count": 3,
+      "pal_ids": [
+        "florina",
+        "liorine",
+        "gwiyobi"
+      ],
+      "sort": 70,
+      "note": null
+    },
+    {
+      "id": "145",
+      "base_id": 4,
+      "role": "배합 부모 (3대 × 암수)",
+      "count": 6,
+      "pal_ids": [],
+      "sort": 10,
+      "note": "목표 조합에 맞춰 교체"
+    },
+    {
+      "id": "146",
+      "base_id": 4,
+      "role": "발전 6+",
+      "count": 4,
+      "pal_ids": [
+        "shogunbokchi",
+        "voljex"
+      ],
+      "sort": 20,
+      "note": "불면 필수"
+    },
+    {
+      "id": "147",
+      "base_id": 4,
+      "role": "관개",
+      "count": 2,
+      "pal_ids": [
+        "bulchorong",
+        "shaolong"
+      ],
+      "sort": 30,
+      "note": null
+    },
+    {
+      "id": "148",
+      "base_id": 4,
+      "role": "운반",
+      "count": 2,
+      "pal_ids": [
+        "umpo"
+      ],
+      "sort": 40,
+      "note": null
+    },
+    {
+      "id": "149",
+      "base_id": 4,
+      "role": "반장",
+      "count": 1,
+      "pal_ids": [
+        "jjariring"
+      ],
+      "sort": 50,
+      "note": null
+    },
+    {
+      "id": "150",
+      "base_id": 4,
+      "role": "교대 예비",
+      "count": 5,
+      "pal_ids": [],
+      "sort": 60,
+      "note": "배합 대기 개체"
+    }
+  ]
+}

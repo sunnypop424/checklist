@@ -5,6 +5,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import { publicClient } from '@/lib/supabase';
 import { isPalList, type Item, type List, type MutateAction } from '@/lib/types';
 import ChecklistPanel from '@/components/ChecklistPanel';
+import { KEY_STORAGE } from '@/components/Gate';
 import OverlayOptionsPanel from './OverlayOptions';
 import {
   DEFAULT_OPTIONS,
@@ -41,8 +42,8 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
 
   // 키를 저장하고 주소창을 정리한다 (방송 중 브라우저가 화면에 잡혀도 키가 안 보이게)
   useEffect(() => {
-    localStorage.setItem('control_key', controlKey);
-    sessionStorage.setItem('control_key', controlKey);
+    localStorage.setItem(KEY_STORAGE, controlKey);
+    sessionStorage.setItem(KEY_STORAGE, controlKey);
     if (window.location.search) {
       window.history.replaceState(null, '', '/control');
     }
@@ -379,11 +380,6 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
               data-active={l.id === activeId ? 'true' : 'false'}
               onClick={() => setActiveId(l.id)}
             >
-              {isPalList(l) && (
-                <span className="pill__bot" aria-hidden="true">
-                  🤖
-                </span>
-              )}
               {l.title}
             </button>
           ))}
@@ -423,7 +419,7 @@ export default function ControlApp({ controlKey, initialLists }: Props) {
 
             {readOnly && (
               <a className="managed" href="/pal">
-                🤖 트래커가 관리 — /pal 에서 수정
+                트래커가 관리 — /pal 에서 수정
               </a>
             )}
           </section>
