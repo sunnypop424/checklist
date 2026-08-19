@@ -339,10 +339,22 @@ export function buildTasks(
       for (const c of costs) expand(recipes, c.item_id, c.qty, copy, out);
     }
 
-    const missing = Object.entries(out.leaf)
-      .filter(([, n]) => n > 0)
-      .map(([id, n]) => ({ id, name: items[id]?.name ?? id, short: n }))
-      .sort((a, b) => b.short - a.short);
+    const toLines = (o: ExpandOut) =>
+      Object.entries(o.leaf)
+        .filter(([, n]) => n > 0)
+        .map(([id, n]) => ({ id, name: items[id]?.name ?? id, short: n }))
+        .sort((a, b) => b.short - a.short);
+
+    const missing = toLines(out);
+
+    // 남은 대수 전부를 짓는 데 필요한 양. "5대 지어라" 라고만 하고
+    // 5대분 재료를 안 알려주면 뭘 캐야 할지 알 수 없다.
+    const copyAll: Inventory = { ...stock };
+    const outAll = emptyOut();
+    if (remaining > 0) {
+      for (const c of costs) expand(recipes, c.item_id, c.qty * remaining, copyAll, outAll);
+    }
+    const missingAll = toLines(outAll);
 
     // 완성근접도: 1대분 재료 중 몇 %가 이미 있는가
     const totalCost = costs.reduce((sum, c) => sum + c.qty, 0);
@@ -363,6 +375,7 @@ export function buildTasks(
       built: built[s.id] ?? 0,
       remaining,
       missing,
+      missingAll,
       ready,
       blockedBy,
       progress: s.count > 0 ? (built[s.id] ?? 0) / s.count : 1,
@@ -377,6 +390,59 @@ export function buildTasks(
 
   tasks.sort((a, b) => b.score - a.score);
   return tasks;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 단계 (설계도 12장 건설 순서)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 아직 안 끝난 가장 앞 단계의 건축물들.
+ *
+ * 자동 획득처를 막고 있는 시설은 build_order 와 무관하게 항상 포함한다 —
+ * 그게 안 지어지면 그 단계 재료 자체를 모을 수가 없다.
+ */
+export function stageStructures(data: PalData, built: BuiltMap): { order: number; structures: Structure[] } {
+  const pending = data.structures.filter((s) => remainingOf(s, built) > 0);
+  if (pending.length === 0) return { order: 0, structures: [] };
+
+  const order = Math.min(...pending.map((s) => s.build_order ?? 99));
+  const inStage = pending.filter((s) => (s.build_order ?? 99) === order);
+
+  // 파밍을 막고 있는 선행 시설은 순서를 앞당겨서라도 같이 넣는다
+  const blockerIds = new Set(
+    data.sources
+      .filter((src) => src.method === 'auto' && src.requires_structure)
+      .filter((src) => (built[src.requires_structure!] ?? 0) < 1)
+      .map((src) => src.requires_structure!)
+  );
+  for (const s of pending) {
+    if (blockerIds.has(s.id) && !inStage.includes(s)) inStage.push(s);
+  }
+
+  return { order, structures: inStage };
+}
+
+/** 특정 건축물 집합만 놓고 본 부족량 */
+export function shortageFor(
+  data: PalData,
+  recipes: RecipeMap,
+  stock: Inventory,
+  built: BuiltMap,
+  structures: Structure[]
+): ExpandOut {
+  const copy: Inventory = { ...stock };
+  const out = emptyOut();
+  const costsByStructure = groupCosts(data);
+
+  for (const s of structures) {
+    const remaining = remainingOf(s, built);
+    if (remaining <= 0) continue;
+    for (const c of costsByStructure[s.id] ?? []) {
+      expand(recipes, c.item_id, c.qty * remaining, copy, out);
+    }
+  }
+  return out;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -582,6 +648,22 @@ export function plan(
   const build = buildTasks(data, recipes, stock, built);
   const craft = craftPlan(data, recipes, stock, shortage);
 
+  // 지금 단계만 놓고 본 부족량. 할 일 탭과 오버레이는 이쪽을 쓴다.
+  const { order, structures: stageStructs } = stageStructures(data, built);
+  const stageShortage = shortageFor(data, recipes, stock, built, stageStructs);
+  const stageFarm = farmTasks(data, recipes, stock, built, stageShortage);
+  const stageLines = stageFarm.flatMap((t) => t.items);
+  const stage = {
+    order,
+    structures: stageStructs,
+    shortage: stageShortage,
+    farm: stageFarm,
+    progress:
+      stageLines.length > 0
+        ? stageLines.reduce((sum, l) => sum + l.progress, 0) / stageLines.length
+        : 1,
+  };
+
   const needs = roster ? palNeeds(roster, data.bases, owned) : [];
   const palCatches = palCatchList(needs, owned, roster?.pals ?? []);
 
@@ -599,6 +681,7 @@ export function plan(
 
   return {
     farm,
+    stage,
     build,
     craft,
     palNeeds: needs,
@@ -629,8 +712,12 @@ export type ChecklistOptions = {
   mode?: 'focus' | 'full';
 };
 
-/** 집중 모드에서 각 구간이 차지할 최대 줄 수 */
-const FOCUS_CAPS = { locked: 1, ready: 1, farm: 3, pal: 1 };
+/**
+ * 집중 모드에서 각 구간이 차지할 최대 줄 수.
+ * 파밍이 가장 많은 자리를 갖는다 — 시간의 대부분이 여기 들어가고,
+ * 건설은 재료가 모이면 자동으로 따라오기 때문이다.
+ */
+const FOCUS_CAPS = { farm: 3, locked: 1, ready: 1, pal: 1 };
 
 export function toChecklist(p: PalPlan, opts: ChecklistOptions = {}): ChecklistLine[] {
   const focus = opts.mode !== 'full';
@@ -642,47 +729,17 @@ export function toChecklist(p: PalPlan, opts: ChecklistOptions = {}): ChecklistL
 
   const cap = (n: number) => (focus ? n : limit);
 
-  // 1. 자동 획득처를 막고 있는 미완성 선행 시설 — 있으면 무조건 최상단
-  const seenBlockers = new Set<string>();
-  for (const t of p.farm) {
-    if (!t.lockedBy || seenBlockers.has(t.lockedBy.id)) continue;
-    if (seenBlockers.size >= cap(FOCUS_CAPS.locked)) break;
-    seenBlockers.add(t.lockedBy.id);
-    lines.push({
-      ref: `build:${t.lockedBy.id}`,
-      label: `${t.lockedBy.name} 건설 — ${t.source.name} 해금`,
-      done: false,
-    });
-  }
+  // 파밍 줄은 "지금 단계" 기준. 4거점 전체로 팰키사이트 광석 4,100 이라고 하면
+  // 손도 못 대지만, 물질 생성기 5대분 500 이라고 하면 오늘 할 수 있는 일이 된다.
+  const farmSource = p.stage.farm.length > 0 ? p.stage.farm : p.farm;
 
-  // 2. 재료가 이미 충분해서 지금 바로 지을 수 있는 건축물
-  let readyCount = 0;
-  for (const b of p.build) {
-    if (!b.ready || seenBlockers.has(b.structure.id)) continue;
-    if (readyCount >= cap(FOCUS_CAPS.ready)) break;
-    readyCount++;
-    lines.push({
-      ref: `build:${b.structure.id}`,
-      label: `${b.structure.name}${b.remaining > 1 ? ` ${b.remaining}대` : ''} — 재료 충족`,
-      done: false,
-    });
-  }
-
-  // 팰 포획 자리를 미리 떼어 둔다.
-  // 획득처가 12개라 그냥 뒤에 붙이면 limit 에 항상 밀려서 영영 안 보인다.
-  // 재료를 다 모아도 팰이 없으면 거점이 안 돌기 때문에 자리를 보장해야 한다.
-  const palReserve = Math.min(
-    cap(FOCUS_CAPS.pal),
-    p.palCatches.length,
-    Math.max(0, limit - lines.length - 1)
-  );
-
-  // 3. farmScore 상위 파밍 작업 — 집중 모드에서는 지금 할 것부터 몇 개만
+  // 1. 재료 파밍이 무조건 최우선.
+  //    건설은 재료가 모이면 자연히 따라온다. 반대로 재료 없이 건설을 띄우면
+  //    "지으라는데 뭘 캐야 하는지" 를 매번 다시 찾아봐야 한다.
   let farmCount = 0;
-  for (const t of p.farm) {
+  for (const t of farmSource) {
     if (t.lockedBy) continue;
     if (farmCount >= cap(FOCUS_CAPS.farm)) break;
-    if (lines.length >= limit - palReserve) break;
     farmCount++;
     const top = t.items[0];
     const detail = top
@@ -697,11 +754,42 @@ export function toChecklist(p: PalPlan, opts: ChecklistOptions = {}): ChecklistL
     });
   }
 
-  // 4. 거점에 배치할 팰 확보 (포획 또는 배합)
+  // 2. 자동 획득처를 막고 있는 미완성 선행 시설.
+  //    이건 파밍의 선행이라 파밍 바로 다음이다.
+  const seenBlockers = new Set<string>();
+  for (const t of farmSource) {
+    if (!t.lockedBy || seenBlockers.has(t.lockedBy.id)) continue;
+    if (seenBlockers.size >= cap(FOCUS_CAPS.locked)) break;
+    seenBlockers.add(t.lockedBy.id);
+    lines.push({
+      ref: `build:${t.lockedBy.id}`,
+      label: `${t.lockedBy.name} 건설 — ${t.source.name} 해금`,
+      done: false,
+    });
+  }
+
+  // 3. 재료가 이미 충분해서 지금 바로 지을 수 있는 건축물
+  let readyCount = 0;
+  for (const b of p.build) {
+    if (!b.ready || seenBlockers.has(b.structure.id)) continue;
+    if (readyCount >= cap(FOCUS_CAPS.ready)) break;
+    readyCount++;
+    lines.push({
+      ref: `build:${b.structure.id}`,
+      label: `${b.structure.name}${b.remaining > 1 ? ` ${b.remaining}대` : ''} — 재료 충족`,
+      done: false,
+    });
+  }
+
+  // 4. 거점에 배치할 팰 확보
+  const palReserve = Math.min(
+    cap(FOCUS_CAPS.pal),
+    p.palCatches.length,
+    Math.max(0, limit - lines.length)
+  );
   for (const c of p.palCatches.slice(0, palReserve)) {
     const where = c.roles[0];
     const detail = where ? `${where.baseName} ${where.role}`.trim() : '거점 배치';
-    // 부모가 아직 없으면 자식을 몇 마리 잡으라고 하면 안 된다 — 배합이 먼저다
     const blocked = c.missingParents.length + c.missingConditions.length > 0;
     const verb = c.via === 'breed' ? (blocked ? '배합 준비' : '배합') : '포획';
     lines.push({
@@ -714,7 +802,7 @@ export function toChecklist(p: PalPlan, opts: ChecklistOptions = {}): ChecklistL
   const active = lines.slice(0, limit);
 
   // 4. 최근 완료 — 부족량이 0이 된 획득처를 뒤에 붙여 성취감을 남긴다
-  const doneSources = p.farm.filter((t) => t.progress >= 1).slice(0, 3);
+  const doneSources = farmSource.filter((t) => t.progress >= 1).slice(0, 3);
   for (const t of doneSources) {
     active.push({ ref: `farm:${t.source.id}`, label: t.source.name, done: true });
   }

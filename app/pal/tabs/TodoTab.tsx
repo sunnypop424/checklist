@@ -1,309 +1,340 @@
 'use client';
 
-import { useMemo } from 'react';
-import ChecklistPanel from '@/components/ChecklistPanel';
-import { toChecklist } from '@/lib/pal/engine';
-import type { PalSettings } from '@/lib/pal/db';
-import type { BuiltMap, OwnedPals, PalPlan } from '@/lib/pal/types';
-import type { Item as ListItem } from '@/lib/types';
+import { useState } from 'react';
+import type { BuildTask, BuiltMap, FarmTask, Inventory, OwnedPals, PalPlan } from '@/lib/pal/types';
 import { nf, pct } from './format';
 
 type Props = {
   plan: PalPlan;
-  settings: PalSettings;
   built: BuiltMap;
   owned: OwnedPals;
-  onUpdateSettings: (patch: Partial<PalSettings>) => void;
+  inventory: Inventory;
   onSync: () => void;
   onBuild: (structureId: string, value: number) => void;
   onCatch: (palId: string, count: number) => void;
+  onSetQty: (itemId: string, qty: number) => void;
+  onAddQty: (itemId: string, delta: number) => void;
+  /** 여러 재고를 한 번에 목표치로 채운다 */
+  onComplete: (entries: { itemId: string; qty: number }[]) => void;
 };
 
 /**
- * 앱을 열면 처음 보이는 화면.
- * 순서는 기획서 8-3 그대로: 막고 있는 시설 → 지금 지을 수 있는 것 → 파밍 → 팰 포획.
+ * 앱을 열면 처음 보이는 화면. 여기서 곧바로 수치를 고칠 수 있어야 한다 —
+ * 방송 중에 탭을 옮겨 다니며 재고를 넣을 여유가 없다.
+ *
+ * 순서는 기획서 8-3 그대로:
+ *   막고 있는 시설 → 지금 지을 수 있는 것 → 파밍 → 팰 확보
  */
 export default function TodoTab({
   plan,
-  settings,
   built,
   owned,
-  onUpdateSettings,
+  inventory,
   onSync,
   onBuild,
   onCatch,
+  onSetQty,
+  onAddQty,
+  onComplete,
 }: Props) {
-  const locked = plan.farm.filter((t) => t.lockedBy);
+  // 획득처마다 품목이 12개까지 있어서 전부 펼치면 할 일 탭이 재고 탭이 된다.
+  // 오버레이에 나가는 대표 품목만 기본 노출하고, 나머지는 접어 둔다.
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  // 파밍은 "지금 단계" 기준. 4거점 전체 수량을 띄우면 손도 못 댄다.
+  const stageFarm = plan.stage.farm.length > 0 ? plan.stage.farm : plan.farm;
+  const locked = stageFarm.filter((t) => t.lockedBy);
   const ready = plan.build.filter((b) => b.ready).slice(0, 6);
-  const farming = plan.farm.filter((t) => !t.lockedBy).slice(0, 6);
-  const catches = plan.palCatches.slice(0, 6);
+  const farming = stageFarm.filter((t) => !t.lockedBy).slice(0, 8);
+  const catches = plan.palCatches.slice(0, 8);
+
+  // 이 단계에서 지어야 하는 건축물 (막고 있는 시설 포함)
+  const stageBuilds = plan.build
+    .filter((b) => plan.stage.structures.some((s) => s.id === b.structure.id))
+    .sort((a, b) => b.structure.unlock_score - a.structure.unlock_score);
 
   const nothing =
     locked.length === 0 && ready.length === 0 && farming.length === 0 && catches.length === 0;
 
-  // 건축물별 비율의 평균이 아니라 "지은 대수 / 전체 대수".
-  // 평균으로 재면 20대짜리 침대와 1대짜리 진료소가 같은 무게가 돼서
-  // 진료소 하나 지었을 뿐인데 진행률이 훌쩍 뛴다.
-  const builtTotal = plan.build.reduce((s, b) => s + b.built, 0);
-  const countTotal = plan.build.reduce((s, b) => s + b.structure.count, 0);
-  const buildProgress = countTotal > 0 ? builtTotal / countTotal : 1;
-
-  const palFilled = plan.palNeeds.reduce((s, n) => s + n.filled, 0);
-  const palSlots = plan.palNeeds.reduce((s, n) => s + n.need, 0);
-
-  // 오버레이에 실제로 나갈 줄. 서버가 sync 할 때 쓰는 함수와 같은 것을 그대로 쓴다.
-  const preview = useMemo(
-    () =>
-      toChecklist(plan, {
-        limit: settings.limit,
-        showTotals: settings.showTotals,
-        mode: settings.mode,
-      }),
-    [plan, settings.limit, settings.showTotals, settings.mode]
-  );
-
-  // ChecklistPanel 은 오버레이가 쓰는 것과 동일한 컴포넌트라, 여기 보이는 게 곧 방송 화면이다
-  const previewItems: ListItem[] = preview.map((l) => ({
-    id: l.ref,
-    list_id: 'pal',
-    label: l.label,
-    done: l.done,
-    position: l.position,
-    ref: l.ref,
-    created_at: '',
-  }));
-
   return (
     <div className="todo">
-      <div className="todo__cols">
-        <div className="todo__main">
-          <section className="card">
-            <div className="card__head">
-              <h2>전체 진행률</h2>
-            </div>
-            <div className="gauges">
-              <Gauge label="최하위 재료" value={plan.overall} />
-              <Gauge label="건축물" value={buildProgress} hint={`${builtTotal} / ${countTotal}대`} />
-              <Gauge label="팰 배치" value={plan.palOverall} hint={`${palFilled} / ${palSlots}마리`} />
-            </div>
-
-            {plan.bottlenecks.length > 0 && (
-              <>
-                <h3 className="card__sub">병목 재료 상위 5</h3>
-                <ul className="bottleneck">
-                  {plan.bottlenecks.map((b) => (
-                    <li key={b.id}>
-                      <span className="bottleneck__name">{b.name}</span>
-                      <span className="bar">
-                        <span className="bar__fill" style={{ width: `${b.progress * 100}%` }} />
-                      </span>
-                      <span className="bottleneck__num">
-                        {nf(b.have)} / {nf(b.need)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </section>
-
-          <section className="card">
-            <div className="card__head">
-              <h2>다음에 할 일</h2>
-            </div>
-
-            {nothing && <p className="muted">할 일이 없습니다. 4거점이 전부 완성됐습니다.</p>}
-
-            {locked.length > 0 && (
-              <Group title="먼저 지어야 자동 파밍이 시작됩니다">
-                {locked.map((t) => (
-                  <li key={t.source.id} className="task task--urgent">
-                    <div className="task__body">
-                      <span className="task__title">
-                        <b>{t.lockedBy!.name}</b> 건설
-                      </span>
-                      <small>
-                        {t.source.name} 해금 — {t.items.length}종 자동 생산
-                      </small>
-                    </div>
-                    <button
-                      className="btn btn--sm btn--brand"
-                      onClick={() => onBuild(t.lockedBy!.id, (built[t.lockedBy!.id] ?? 0) + 1)}
-                    >
-                      1대 지음
-                    </button>
-                  </li>
-                ))}
-              </Group>
-            )}
-
-            {ready.length > 0 && (
-              <Group title="재료가 충분해서 지금 지을 수 있습니다">
-                {ready.map((b) => (
-                  <li key={b.structure.id} className="task task--ready">
-                    <div className="task__body">
-                      <span className="task__title">
-                        <b>{b.structure.name}</b>
-                      </span>
-                      <small>
-                        {b.base?.name} · {b.built}/{b.structure.count}대
-                      </small>
-                    </div>
-                    <button
-                      className="btn btn--sm btn--brand"
-                      onClick={() => onBuild(b.structure.id, b.built + 1)}
-                    >
-                      1대 지음
-                    </button>
-                  </li>
-                ))}
-              </Group>
-            )}
-
-            {farming.length > 0 && (
-              <Group title="파밍">
-                {farming.map((t) => {
-                  const top = t.items[0];
-                  return (
-                    <li key={t.source.id} className="task">
-                      <div className="task__body">
-                        <span className="task__title">
-                          <b>{t.source.name}</b>
-                          {t.source.method === 'manual' && (
-                            <span className="chip chip--manual">수동</span>
-                          )}
-                        </span>
-                        <small>
-                          {top ? `${top.name} ${nf(top.have)} / ${nf(top.need)}` : ''}
-                          {t.source.place ? ` · ${t.source.place}` : ''}
-                        </small>
-                      </div>
-                      <span className="bar bar--sm">
-                        <span className="bar__fill" style={{ width: `${t.progress * 100}%` }} />
-                      </span>
-                      <span className="task__pct">{pct(t.progress)}</span>
-                    </li>
-                  );
-                })}
-              </Group>
-            )}
-
-            {catches.length > 0 && (
-              <Group title="거점에 배치할 팰 확보">
-                {catches.map((c) => (
-                  <li key={c.pal.id} className="task">
-                    <div className="task__body">
-                      <span className="task__title">
-                        <b>{c.pal.name}</b>
-                        <span className="chip">{c.short}마리</span>
-                        {c.via === 'breed' && <span className="chip chip--breed">배합</span>}
-                        {c.pal.nocturnal && <span className="chip chip--night">야행성</span>}
-                      </span>
-                      <small>
-                        {c.roles.map((r) => `${r.baseName} ${r.role}`.trim()).join(' · ')}
-                        {c.pal.source ? ` · ${c.pal.source}` : ''}
-                      </small>
-                      {c.missingParents.length > 0 && (
-                        <small className="task__blocked">
-                          배합 부모: {c.missingParents.map((p) => p.name).join(' · ')} 필요
-                        </small>
-                      )}
-                      {c.missingConditions.length > 0 && (
-                        <small className="task__blocked">
-                          소지 조건: {c.missingConditions.map((p) => p.name).join(' · ')} 풀농축 필요
-                        </small>
-                      )}
-                      {c.note && <small>{c.note}</small>}
-                    </div>
-                    <button
-                      className="btn btn--sm"
-                      onClick={() => onCatch(c.pal.id, (owned[c.pal.id] ?? 0) + 1)}
-                    >
-                      확보 +1
-                    </button>
-                  </li>
-                ))}
-              </Group>
-            )}
-          </section>
+      <section className="card">
+        <div className="card__head">
+          <h2>다음에 할 일</h2>
+          <span className="muted">
+            {plan.stage.structures.length > 0
+              ? `${plan.stage.order}단계 · ${plan.stage.structures.length}종 건설 · 재료 ${pct(plan.stage.progress)}`
+              : '전부 완료'}
+          </span>
+          <button className="btn btn--sm" onClick={onSync}>
+            오버레이 갱신
+          </button>
         </div>
 
-        <aside className="todo__side">
-          <section className="card">
-            <div className="card__head">
-              <h2>오버레이 미리보기</h2>
-              <button className="btn btn--sm" onClick={onSync}>
-                지금 갱신
-              </button>
-            </div>
+        {nothing && <p className="muted">할 일이 없습니다. 4거점이 전부 완성됐습니다.</p>}
 
-            <p className="muted">
-              여기 보이는 그대로 <code>/o/pal</code> 에 나갑니다.
-            </p>
+        {farming.length > 0 && (
+          <Group title={`${plan.stage.order}단계 재료 파밍`}>
+            {farming.map((t) => (
+              <FarmRow
+                key={t.source.id}
+                task={t}
+                inventory={inventory}
+                open={expanded[t.source.id] === true}
+                onToggle={() => setExpanded((s) => ({ ...s, [t.source.id]: !s[t.source.id] }))}
+                onSetQty={onSetQty}
+                onAddQty={onAddQty}
+                onComplete={onComplete}
+              />
+            ))}
+          </Group>
+        )}
 
-            <div className="ovpreview">
-              <div className="overlay-root" style={{ fontSize: '0.85rem' }}>
-                <ChecklistPanel title="팰월드 4거점" items={previewItems} sortDone={false} />
-              </div>
-            </div>
+        {locked.length > 0 && (
+          <Group title="먼저 지어야 자동 파밍이 시작됩니다">
+            {locked.map((t) => (
+              <BuildRow
+                key={t.source.id}
+                task={plan.build.find((b) => b.structure.id === t.lockedBy!.id)}
+                fallbackName={t.lockedBy!.name}
+                sub={`${t.source.name} 해금 — ${t.items.length}종 자동 생산`}
+                urgent
+                built={built[t.lockedBy!.id] ?? 0}
+                onBuild={(v) => onBuild(t.lockedBy!.id, v)}
+              />
+            ))}
+          </Group>
+        )}
 
-            <div className="settings">
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={settings.mode === 'focus'}
-                  onChange={(e) => onUpdateSettings({ mode: e.target.checked ? 'focus' : 'full' })}
+        {ready.length > 0 && (
+          <Group title="재료가 충분해서 지금 지을 수 있습니다">
+            {ready.map((b) => (
+              <li key={b.structure.id} className="task task--ready">
+                <div className="task__body">
+                  <span className="task__title">
+                    <b>{b.structure.name}</b>
+                    <span className="task__pct">
+                      {b.built} / {b.structure.count}대
+                    </span>
+                  </span>
+                  <small>{b.base?.name}</small>
+                </div>
+                <button
+                  className="btn btn--sm btn--brand"
+                  onClick={() => onBuild(b.structure.id, b.built + 1)}
+                >
+                  1대 지음
+                </button>
+              </li>
+            ))}
+          </Group>
+        )}
+
+        {stageBuilds.filter((b) => !b.ready && !locked.some((l) => l.lockedBy?.id === b.structure.id)).length > 0 && (
+          <Group title={`${plan.stage.order}단계에서 지어야 하는 것`}>
+            {stageBuilds
+              .filter((b) => !b.ready && !locked.some((l) => l.lockedBy?.id === b.structure.id))
+              .map((b) => (
+                <BuildRow
+                  key={b.structure.id}
+                  task={b}
+                  fallbackName={b.structure.name}
+                  sub={b.base?.name ?? ''}
+                  built={b.built}
+                  onBuild={(v) => onBuild(b.structure.id, v)}
                 />
-                <span>
-                  집중 모드
+              ))}
+          </Group>
+        )}
+
+        {catches.length > 0 && (
+          <Group title="거점에 배치할 팰 확보">
+            {catches.map((c) => (
+              <li key={c.pal.id} className="task">
+                <div className="task__body">
+                  <span className="task__title">
+                    <b>{c.pal.name}</b>
+                    <span className="chip">{c.short}마리</span>
+                    {c.via === 'breed' && <span className="chip chip--breed">배합</span>}
+                    {c.pal.nocturnal && <span className="chip chip--night">야행성</span>}
+                  </span>
                   <small>
-                    지금 할 것 위주로 몇 줄만 띄웁니다. 끄면 표시 항목 수만큼 꽉 채웁니다.
+                    {c.roles.map((r) => `${r.baseName} ${r.role}`.trim()).join(' · ')}
+                    {c.pal.source ? ` · ${c.pal.source}` : ''}
                   </small>
-                </span>
-              </label>
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={settings.showTotals}
-                  onChange={(e) => onUpdateSettings({ showTotals: e.target.checked })}
-                />
-                <span>
-                  총량 표시
-                  <small>끄면 &quot;발화 기관 32%&quot; 처럼 비율만 방송에 나갑니다</small>
-                </span>
-              </label>
-              <label className="check">
-                <input
-                  type="checkbox"
-                  checked={settings.autoSync}
-                  onChange={(e) => onUpdateSettings({ autoSync: e.target.checked })}
-                />
-                <span>
-                  자동 갱신
-                  <small>재고를 고칠 때마다 오버레이를 다시 밀어넣습니다</small>
-                </span>
-              </label>
-              <label className="field">
-                <span>표시 항목 수</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={settings.limit}
-                  onChange={(e) => onUpdateSettings({ limit: Number(e.target.value) })}
-                />
-              </label>
-            </div>
-
-            <p className="muted">
-              OBS 브라우저 소스 URL 은 <code>/o/pal</code> 입니다. 체크리스트 오버레이와 같은
-              방식이라 기존 소스를 복제해 URL 만 바꾸면 됩니다. 크기·글자 크기 옵션은{' '}
-              <a href="/control">컨트롤 화면</a>에서 조정할 수 있습니다.
-            </p>
-          </section>
-        </aside>
-      </div>
+                  {c.missingParents.length > 0 && (
+                    <small className="task__blocked">
+                      배합 부모: {c.missingParents.map((p) => p.name).join(' · ')} 필요
+                    </small>
+                  )}
+                  {c.missingConditions.length > 0 && (
+                    <small className="task__blocked">
+                      소지 조건: {c.missingConditions.map((p) => p.name).join(' · ')} 풀농축 필요
+                    </small>
+                  )}
+                  {c.note && <small>{c.note}</small>}
+                </div>
+                <div className="task__count">
+                  <button
+                    className="qbtn"
+                    onClick={() => onCatch(c.pal.id, (owned[c.pal.id] ?? 0) - 1)}
+                    disabled={(owned[c.pal.id] ?? 0) <= 0}
+                  >
+                    −
+                  </button>
+                  <span className="task__num">{owned[c.pal.id] ?? 0}</span>
+                  <button
+                    className="qbtn"
+                    onClick={() => onCatch(c.pal.id, (owned[c.pal.id] ?? 0) + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+              </li>
+            ))}
+          </Group>
+        )}
+      </section>
     </div>
+  );
+}
+
+/**
+ * 건설 행. "5대 지어라" 라고만 하면 뭘 캐야 할지 알 수 없으니
+ * 남은 대수 전부에 필요한 재료를 같이 보여준다.
+ */
+function BuildRow({
+  task,
+  fallbackName,
+  sub,
+  urgent,
+  built,
+  onBuild,
+}: {
+  task?: BuildTask;
+  fallbackName: string;
+  sub: string;
+  urgent?: boolean;
+  built: number;
+  onBuild: (value: number) => void;
+}) {
+  const remaining = task?.remaining ?? 1;
+  const count = task?.structure.count ?? 1;
+  const need = task?.missingAll ?? [];
+
+  return (
+    <li className={`task ${urgent ? 'task--urgent' : ''}`}>
+      <div className="task__body">
+        <span className="task__title">
+          <b>{task?.structure.name ?? fallbackName}</b> 건설
+          <span className="task__pct">
+            {built} / {count}대
+          </span>
+        </span>
+        {sub && <small>{sub}</small>}
+
+        {need.length > 0 ? (
+          <small className="task__need">
+            남은 {remaining}대분 부족: {need.slice(0, 5).map((m) => `${m.name} ${nf(m.short)}`).join(' · ')}
+            {need.length > 5 && ` 외 ${need.length - 5}종`}
+          </small>
+        ) : (
+          <small className="task__ready">재료 충족 — 지금 지을 수 있습니다</small>
+        )}
+        {task?.blockedBy && (
+          <small className="task__blocked">{task.blockedBy.name} 이(가) 먼저 필요합니다</small>
+        )}
+      </div>
+      <button className="btn btn--sm btn--brand" onClick={() => onBuild(built + 1)}>
+        1대 지음
+      </button>
+    </li>
+  );
+}
+
+/**
+ * 할 일 탭에서 바로 재고를 고칠 수 있는 파밍 행.
+ * 오버레이에 나가는 건 대표 품목 하나뿐이라 그것만 펼쳐 두고,
+ * 같은 획득처의 나머지 품목은 접어서 필요할 때만 연다.
+ */
+function FarmRow({
+  task,
+  inventory,
+  open,
+  onToggle,
+  onSetQty,
+  onAddQty,
+  onComplete,
+}: {
+  task: FarmTask;
+  inventory: Inventory;
+  open: boolean;
+  onToggle: () => void;
+  onSetQty: (itemId: string, qty: number) => void;
+  onAddQty: (itemId: string, delta: number) => void;
+  onComplete: (entries: { itemId: string; qty: number }[]) => void;
+}) {
+  const shown = open ? task.items : task.items.slice(0, 1);
+  const more = task.items.length - 1;
+
+  return (
+    <li className="task task--farm">
+      <div className="task__body">
+        <span className="task__title">
+          <b>{task.source.name}</b>
+          {task.source.method === 'manual' && <span className="chip chip--manual">수동</span>}
+          <span className="task__pct">{pct(task.progress)}</span>
+          <button
+            className="btn btn--sm btn--done"
+            title="이 획득처의 재료를 전부 목표치로 채웁니다"
+            onClick={() => onComplete(task.items.map((i) => ({ itemId: i.id, qty: i.need })))}
+          >
+            전부 완료
+          </button>
+        </span>
+        {task.source.place && <small>{task.source.place}</small>}
+
+        <ul className="qlist">
+          {shown.map((line) => (
+            <li key={line.id} className="qrow">
+              <span className="qrow__name">{line.name}</span>
+              <input
+                className="qrow__qty"
+                type="number"
+                min={0}
+                value={inventory[line.id] ?? 0}
+                onChange={(e) => onSetQty(line.id, Number(e.target.value))}
+                onFocus={(e) => e.currentTarget.select()}
+              />
+              <span className="qrow__need">/ {nf(line.need)}</span>
+              <span className="qrow__btns">
+                {[10, 100, 500].map((d) => (
+                  <button key={d} className="qbtn" onClick={() => onAddQty(line.id, d)}>
+                    +{d}
+                  </button>
+                ))}
+                <button className="qbtn qbtn--minus" onClick={() => onAddQty(line.id, -10)}>
+                  −10
+                </button>
+                <button
+                  className="qbtn qbtn--done"
+                  title="이 재료를 다 모았습니다"
+                  onClick={() => onSetQty(line.id, line.need)}
+                >
+                  완료
+                </button>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        {more > 0 && (
+          <button className="task__more" onClick={onToggle}>
+            {open ? '접기' : `이 획득처의 나머지 ${more}종 펼치기`}
+          </button>
+        )}
+      </div>
+    </li>
   );
 }
 
@@ -313,18 +344,5 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
       <h3 className="card__sub">{title}</h3>
       <ul className="tasks">{children}</ul>
     </>
-  );
-}
-
-function Gauge({ label, value, hint }: { label: string; value: number; hint?: string }) {
-  return (
-    <div className="gauge">
-      <div className="gauge__label">{label}</div>
-      <div className="gauge__value">{pct(value)}</div>
-      <span className="bar">
-        <span className="bar__fill" style={{ width: `${value * 100}%` }} />
-      </span>
-      {hint && <div className="gauge__hint">{hint}</div>}
-    </div>
   );
 }

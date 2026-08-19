@@ -139,8 +139,10 @@ export type BuildTask = {
   base: PalBase | null;
   built: number;
   remaining: number;
-  /** 1대를 더 짓기 위해 부족한 재료 (재고·다른 건축물 소모 반영) */
+  /** 1대를 더 짓기 위해 부족한 재료 */
   missing: { id: string; name: string; short: number }[];
+  /** 남은 대수 전부를 짓기 위해 부족한 재료 */
+  missingAll: { id: string; name: string; short: number }[];
   /** 재료가 전부 있어 지금 바로 지을 수 있다 */
   ready: boolean;
   /** 이 건축물이 선행 시설(예: 고대 문명 화로) 때문에 막혀 있다 */
@@ -199,8 +201,26 @@ export type ChecklistLine = {
   position: number;
 };
 
-export type PalPlan = {
+/**
+ * 지금 단계 — 설계도 12장의 건설 순서(build_order) 중 아직 안 끝난 가장 앞 단계.
+ *
+ * 전체 4거점 기준으로 "팰키사이트 광석 4,100" 이라고 하면 손도 못 댄다.
+ * "물질 생성기 5대에 필요한 500" 이라고 해야 오늘 할 수 있는 일이 된다.
+ */
+export type Stage = {
+  order: number;
+  structures: Structure[];
+  shortage: ExpandOut;
   farm: FarmTask[];
+  /** 이 단계 재료 달성률 0~1 */
+  progress: number;
+};
+
+export type PalPlan = {
+  /** 4거점 전체 기준 (파밍 탭에서 전체 그림을 볼 때) */
+  farm: FarmTask[];
+  /** 지금 단계만 (할 일 탭·오버레이가 쓰는 것) */
+  stage: Stage;
   build: BuildTask[];
   craft: CraftLine[];
   /** 거점 배치 자리별 충원 현황 */

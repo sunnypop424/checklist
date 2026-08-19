@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 import docSeed from './__fixtures__/design-doc-seed.json';
 import liveSeed from './__fixtures__/seed.json';
 import roster from './__fixtures__/roster.json';
-import { buildRecipeMap, plan } from './engine';
+import { buildRecipeMap, plan, toChecklist } from './engine';
 import type { PalData, PalRoster } from './types';
 
 const doc = docSeed as unknown as PalData;
@@ -284,5 +284,46 @@ describe('현재 시드 기준 우선순위', () => {
   it('팰키사이트 주괴는 고대 문명 화로 없이는 막힌다 (설계도 11장)', () => {
     const hotspring = p.build.find((b) => b.structure.id === 'hotspring_b1');
     expect(hotspring?.blockedBy?.id).toBe('furnace_b1');
+  });
+});
+
+describe('단계 — 지금 할 수 있는 크기로 자른다', () => {
+  it('아무것도 없으면 1단계부터 시작한다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    expect(p.stage.order).toBe(1);
+    expect(p.stage.structures.length).toBeGreaterThan(0);
+  });
+
+  it('단계 부족량이 4거점 전체보다 훨씬 작다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const total = p.shortage.leaf.palkicite_ore ?? 0;
+    const stage = p.stage.shortage.leaf.palkicite_ore ?? 0;
+
+    expect(total).toBe(4100);
+    expect(stage).toBeGreaterThan(0);
+    expect(stage).toBe(700);
+    expect(stage).toBeLessThan(total);
+  });
+
+  it('파밍을 막는 시설은 build_order 와 무관하게 이번 단계에 들어온다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    // 물질 생성기는 build_order 2 지만 광물 12종을 막고 있으므로 1단계에 포함된다
+    expect(p.stage.structures.map((s) => s.id)).toContain('matter_generator_b2');
+  });
+
+  it('체크리스트 첫 줄은 재료 파밍이다', () => {
+    const lines = toChecklist(plan(live, {}, {}, crew, {}));
+    expect(lines[0].ref.startsWith('farm:')).toBe(true);
+  });
+
+  it('건설 대상에는 남은 대수 전부의 부족 재료가 붙는다', () => {
+    const p = plan(live, {}, {}, crew, {});
+    const gen = p.build.find((b) => b.structure.id === 'matter_generator_b2')!;
+
+    expect(gen.remaining).toBe(5);
+    // 1대분보다 5대분이 더 많아야 한다
+    const one = gen.missing.find((m) => m.id === 'palkicite_ore')!.short;
+    const all = gen.missingAll.find((m) => m.id === 'palkicite_ore')!.short;
+    expect(all).toBe(one * 5);
   });
 });

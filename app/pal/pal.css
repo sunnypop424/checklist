@@ -128,7 +128,7 @@
 .pal__sync {
   margin-left: auto;
   color: var(--text-cool-weak);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -143,6 +143,7 @@
 /* 각 탭의 최상위 래퍼. 여기에 gap 이 없으면 카드끼리 딱 붙는다 —
    .pal__body 의 gap 은 "탭 내용 전체" 하나에만 걸리기 때문이다. */
 .todo,
+.progress,
 .inv,
 .farm,
 .craft,
@@ -195,9 +196,9 @@
 }
 
 .card .card__sub {
-  margin: 14px 0 6px;
-  color: var(--text-cool-weak);
-  font-size: 12px;
+  margin: 16px 0 7px;
+  color: var(--text-cool);
+  font-size: 13px;
   font-weight: 700;
 }
 .card .card__sub:first-of-type {
@@ -216,8 +217,8 @@
 .pal .muted {
   margin: 0 0 8px;
   color: var(--text-cool-weak);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.55;
 }
 /* 카드 헤더 오른쪽에 붙는 짧은 보조 텍스트에는 마진이 없어야 한다 */
 .card__head .muted,
@@ -303,13 +304,13 @@
 }
 
 .qbtn {
-  min-width: 30px;
-  padding: 4px 7px;
+  min-width: 34px;
+  padding: 5px 8px;
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--surface-base);
   color: var(--text-cool);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   font-variant-numeric: tabular-nums;
@@ -327,11 +328,11 @@
 }
 
 .chip {
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: var(--surface-base);
   color: var(--text-cool);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -367,58 +368,113 @@
 .task__blocked {
   color: #ffab6b;
 }
+/* 이 건축물을 짓는 데 아직 모자란 재료 */
+.task__need {
+  color: var(--text-cool);
+}
+.task__ready {
+  color: var(--brand-strong);
+}
+
+/* ---------- 할 일 탭에서 바로 고치는 수량 ---------- */
+
+.task--farm {
+  align-items: stretch;
+}
+.task--farm .task__title {
+  width: 100%;
+  justify-content: flex-start;
+}
+.task--farm .task__title .task__pct {
+  margin-left: auto;
+}
+
+.qlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.qrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+}
+.qrow__name {
+  flex: 0 0 auto;
+  min-width: 96px;
+  color: var(--text-cool-strong);
+  font-size: 13px;
+}
+.qrow__qty {
+  width: 92px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #ffffff1f;
+  background: var(--surface-weakest);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.qrow__need {
+  color: var(--text-cool-weak);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.qrow__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-left: auto;
+}
+
+/* 다 모았을 때 한 번에 끝내는 버튼 — 22,038 을 손으로 칠 수는 없다 */
+.btn--done,
+.qbtn--done {
+  background: #00ffa31f;
+  color: var(--brand);
+}
+.btn--done:hover:not(:disabled),
+.qbtn--done:hover:not(:disabled) {
+  background: #00ffa333;
+  color: var(--brand);
+}
+
+.task__more {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: var(--text-cool-weak);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.task__more:hover {
+  color: var(--text-cool-strong);
+}
+
+.task__count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.task__num {
+  min-width: 22px;
+  text-align: center;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---------- 할 일 ---------- */
 
-/* 넓은 화면에서는 오버레이 미리보기를 오른쪽에 붙여 둔다 —
-   재고를 고치면서 방송 화면이 어떻게 바뀌는지 바로 봐야 한다. */
-.todo__cols {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  align-items: start;
-  gap: 14px;
-}
-.todo__main,
-.todo__side {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-.todo__side {
-  position: sticky;
-  top: 14px;
-}
-
-@media (max-width: 1080px) {
-  .todo__cols {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .todo__side {
-    position: static;
-  }
-}
-
-/* 미리보기는 실제 오버레이와 같은 컴포넌트를 그린다.
-   투명 배경이라 체커보드를 깔아야 글자 대비가 방송과 비슷하게 보인다. */
-.ovpreview {
-  margin: 10px 0;
-  padding: 8px;
-  border-radius: var(--radius);
-  border: 1px solid #ffffff14;
-  background-color: #1a1b1d;
-  background-image:
-    linear-gradient(45deg, #ffffff08 25%, transparent 25%, transparent 75%, #ffffff08 75%),
-    linear-gradient(45deg, #ffffff08 25%, transparent 25%, transparent 75%, #ffffff08 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 8px 8px;
-  overflow: hidden;
-}
-.ovpreview .overlay-root {
-  position: static;
-  width: 100%;
-  height: auto;
-}
 
 .gauges {
   display: flex;
@@ -440,7 +496,7 @@
 }
 .gauge__label {
   color: var(--text-cool-weak);
-  font-size: 12px;
+  font-size: 13px;
 }
 .gauge__value {
   color: var(--brand);
@@ -451,7 +507,7 @@
 }
 .gauge__hint {
   color: var(--text-cool-weak);
-  font-size: 11px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -480,7 +536,7 @@
   flex: 0 0 130px;
   text-align: right;
   color: var(--text-cool-weak);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -529,14 +585,13 @@
 }
 .task__body small {
   color: var(--text-cool-weak);
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.45;
 }
 .task__pct {
-  flex: 0 0 40px;
-  text-align: right;
   color: var(--text-cool);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -563,8 +618,10 @@
 }
 .check small {
   display: block;
+  margin-top: 2px;
   color: var(--text-cool-weak);
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.45;
 }
 .field {
   display: flex;
@@ -664,7 +721,7 @@
   flex: 1 1 140px;
   text-align: right;
   color: var(--text-cool-weak);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 .invrow__need b {
@@ -713,14 +770,14 @@
   flex: 0 0 130px;
   text-align: right;
   color: var(--text-cool);
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 .farmrow__short {
   flex: 0 0 80px;
   text-align: right;
   color: #ffab6b;
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -755,7 +812,7 @@
 .craftrow__inputs li {
   display: flex;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-cool);
 }
 .craftrow__inputs li[data-short='true'] b {
@@ -830,7 +887,8 @@
 .brow__main small,
 .catchrow__main small {
   flex-basis: 100%;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.45;
 }
 .brow__missing {
   color: var(--text-cool-weak);
@@ -867,7 +925,7 @@
 }
 .prow__slots {
   color: var(--text-cool);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -879,11 +937,11 @@
 .palchip {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 4px;
+  gap: 3px;
+  padding: 3px 5px;
   border-radius: 999px;
   background: var(--surface-base);
-  font-size: 12px;
+  font-size: 13px;
 }
 .palchip[data-have='true'] {
   background: #00ffa31f;
@@ -925,7 +983,7 @@
 .prow__todo {
   margin-top: 6px;
   color: #ffab6b;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* ---------- 데이터 ---------- */
@@ -957,7 +1015,7 @@
 .editlist small,
 .editrow small {
   color: var(--text-cool-weak);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* ---------- 토스트 ---------- */

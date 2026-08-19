@@ -7,13 +7,14 @@ import type { PalSettings } from '@/lib/pal/db';
 import type { BuiltMap, Inventory, OwnedPals, PalData, PalRoster } from '@/lib/pal/types';
 import type { PalMutateAction } from '@/app/api/pal/mutate/route';
 import TodoTab from './tabs/TodoTab';
+import ProgressTab from './tabs/ProgressTab';
 import InventoryTab from './tabs/InventoryTab';
 import FarmTab from './tabs/FarmTab';
 import CraftTab from './tabs/CraftTab';
 import BasesTab from './tabs/BasesTab';
 import DataTab from './tabs/DataTab';
 
-const TABS = ['할 일', '재고', '파밍', '제작', '거점', '데이터'] as const;
+const TABS = ['할 일', '재고', '파밍', '제작', '거점', '진행률', '데이터'] as const;
 type Tab = (typeof TABS)[number];
 
 type Props = {
@@ -140,6 +141,25 @@ export default function PalApp({
     [inventory, optimistic]
   );
 
+  /**
+   * 여러 재고를 한 번에 목표치로 채운다 ("파밍 완료" 버튼).
+   * 22,038개를 손으로 타이핑할 수는 없으니, 다 모았으면 한 번에 끝내야 한다.
+   */
+  const completeItems = useCallback(
+    (entries: { itemId: string; qty: number }[]) => {
+      if (entries.length === 0) return;
+      const prev = { ...inventory };
+      const next = { ...inventory };
+      for (const e of entries) next[e.itemId] = Math.max(0, e.qty);
+      void optimistic(
+        () => setInventory(next),
+        () => setInventory(prev),
+        { action: 'set_inventory_bulk', entries: entries.map((e) => ({ ...e, qty: Math.max(0, e.qty) })) }
+      );
+    },
+    [inventory, optimistic]
+  );
+
   const setBuiltCount = useCallback(
     (structureId: string, value: number) => {
       const prev = built[structureId] ?? 0;
@@ -241,13 +261,24 @@ export default function PalApp({
         {tab === '할 일' && (
           <TodoTab
             plan={p}
-            settings={settings}
-            onUpdateSettings={updateSettings}
             onSync={forceSync}
             onBuild={setBuiltCount}
             built={built}
             onCatch={setPalOwned}
             owned={owned}
+            inventory={inventory}
+            onSetQty={setQty}
+            onAddQty={addQty}
+            onComplete={completeItems}
+          />
+        )}
+        {tab === '진행률' && (
+          <ProgressTab
+            plan={p}
+            settings={settings}
+            onUpdateSettings={updateSettings}
+            onSync={forceSync}
+            syncedAt={syncedAt}
           />
         )}
         {tab === '재고' && (
